@@ -1,0 +1,6 @@
+knx:
+  light:
+    - name: Diele
+      individual_address: 1.1.5
+      address: 1/0/15
+      state_address: 1/5/15

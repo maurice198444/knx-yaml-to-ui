@@ -1,0 +1,8 @@
+light:
+  - name: Wohnzimmer
+    address: 1/0/16
+    state_address: 1/5/16
+switch:
+  - name: Steckdose
+    address: 2/0/1
+    state_address: 2/5/1
