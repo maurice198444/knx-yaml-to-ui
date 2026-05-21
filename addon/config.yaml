@@ -1,0 +1,22 @@
+name: knx-yaml-to-ui
+version: "0.0.1"
+slug: knx_yaml_to_ui
+description: Convert and manage HA-KNX YAML configs as UI entities
+url: https://github.com/MauriceStockfleth/knx-yaml-to-ui
+arch:
+  - amd64
+  - aarch64
+  - armv7
+init: false
+ingress: true
+ingress_port: 8099
+panel_icon: mdi:swap-horizontal
+panel_title: KNX YAML
+map:
+  - "config:rw"
+  - "share:rw"
+homeassistant_api: true
+hassio_api: true
+auth_api: true
+options: {}
+schema: {}
