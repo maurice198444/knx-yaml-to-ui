@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -29,3 +30,35 @@ def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+
+class FakeHAClient:
+    """In-memory stand-in for HAClient. Records calls; canned results."""
+
+    def __init__(self) -> None:
+        self.sent: list[dict[str, Any]] = []
+        self.results: dict[str, dict[str, Any]] = {}
+        self.errors: dict[str, str] = {}
+        self.next_entity_id = "light.diele"
+
+    async def send(self, payload: dict[str, Any]) -> dict[str, Any]:
+        self.sent.append(payload)
+        ptype = payload["type"]
+        if ptype in self.errors:
+            from app.adapters.ha_client import HAClientError
+
+            raise HAClientError(self.errors[ptype])
+        if ptype in self.results:
+            return self.results[ptype]
+        if ptype == "knx/validate_entity":
+            return {"success": True}
+        if ptype == "knx/create_entity":
+            return {"entity_id": self.next_entity_id, "unique_id": "abc123"}
+        if ptype == "config/entity_registry/list":
+            return {"entities": []}
+        return {}
+
+
+@pytest.fixture
+def fake_ha_client() -> FakeHAClient:
+    return FakeHAClient()
