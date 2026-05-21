@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start the FastAPI app via uvicorn
+# ==============================================================================
+bashio::log.info "Starting knx-yaml-to-ui uvicorn server on port 8099"
+
+cd /app
+exec uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8099 \
+    --no-access-log \
+    --proxy-headers \
+    --forwarded-allow-ips "*"
