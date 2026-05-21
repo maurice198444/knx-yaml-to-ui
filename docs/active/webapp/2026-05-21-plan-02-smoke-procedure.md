@@ -43,7 +43,7 @@ light:
 ## Step 4 — Curl smoke (from HA terminal addon)
 
 ```bash
-INGRESS=http://localhost:8123/api/hassio_ingress/<token>   # token from Add-on UI
+INGRESS=http://localhost:8123/api/hassio_ingress/<TOKEN>  # token from Add-on UI
 
 curl -s $INGRESS/api/health | jq
 curl -s $INGRESS/api/yaml/files | jq
@@ -79,13 +79,14 @@ After smoke passes, create `docs/active/webapp/2026-05-21-plan-02-smoke.md`:
 # Plan-02 Smoke Test Result — 2026-05-DD
 
 HA-Version: 2026.5.x
-- [x] /api/health         200
-- [x] /api/yaml/files     200, light_test.yaml listed
-- [x] /api/yaml/parse     200, 1 domain (light), 1 entity (Plan02 Smoke Diele)
-- [x] /api/convert/dry-run  200, ok
-- [x] /api/convert/commit   200, entity_id=light.plan02_smoke_diele, applied=true
+
+- [x] /api/health 200
+- [x] /api/yaml/files 200, light_test.yaml listed
+- [x] /api/yaml/parse 200, 1 domain (light), 1 entity (Plan02 Smoke Diele)
+- [x] /api/convert/dry-run 200, ok
+- [x] /api/convert/commit 200, entity_id=light.plan02_smoke_diele, applied=true
 - [x] Entity visible in HA UI
-- [x] /ws/state-stream      JSON event on toggle
+- [x] /ws/state-stream JSON event on toggle
 
 Migration row id: <N>
 ```

@@ -37,7 +37,7 @@ def build_app(*, start_ha_client: bool = True) -> FastAPI:
 
     app = FastAPI(
         title="knx-yaml-to-ui",
-        version="0.0.2",
+        version="0.0.3",
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
         lifespan=lifespan,
