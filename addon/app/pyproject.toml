@@ -1,6 +1,10 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "knx-yaml-to-ui-addon"
-version = "0.0.1"
+version = "0.0.2"
 requires-python = ">=3.12"
 dependencies = [
     "knx-yaml-to-ui-core",
@@ -21,6 +25,10 @@ dev = [
     "ruff>=0.6",
     "mypy>=1.11",
 ]
+
+[tool.setuptools]
+packages = ["app", "app.adapters", "app.routers"]
+package-dir = {"app" = "."}
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
