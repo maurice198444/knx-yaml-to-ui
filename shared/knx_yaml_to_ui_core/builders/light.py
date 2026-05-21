@@ -3,6 +3,7 @@
 Bugfix #4: color_temperature block is only emitted when `color_temperature_mode`
 is set explicitly. Naked temperature-addresses without a mode are dropped.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -38,9 +39,7 @@ def build_light(yml: dict[str, Any]) -> UIEntityPayload:
         if ct_addr:
             validate_ga(ct_addr, field=f"{label}.color_temperature_address")
             knx["color_temperature_mode"] = mode
-            knx["ga_color_temp"] = _ga_block(
-                ct_addr, yml.get("color_temperature_state_address")
-            )
+            knx["ga_color_temp"] = _ga_block(ct_addr, yml.get("color_temperature_state_address"))
             if "min_kelvin" in yml:
                 knx["min_kelvin"] = yml["min_kelvin"]
             if "max_kelvin" in yml:

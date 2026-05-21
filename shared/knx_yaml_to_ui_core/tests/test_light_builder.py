@@ -1,4 +1,5 @@
 """Light builder unit tests covering Bugfix #4 (color_temp only for CCT mode)."""
+
 import pytest
 
 from knx_yaml_to_ui_core.builders.light import build_light

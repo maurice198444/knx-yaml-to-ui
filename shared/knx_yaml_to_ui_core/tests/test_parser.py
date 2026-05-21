@@ -1,4 +1,5 @@
 """Parser unit tests — covers 3 supported YAML shapes plus error paths."""
+
 from pathlib import Path
 
 import pytest

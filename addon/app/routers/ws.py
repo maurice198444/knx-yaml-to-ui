@@ -1,4 +1,5 @@
 """Browser-facing WebSocket — proxies filtered HA state_changed events."""
+
 from __future__ import annotations
 
 import logging
@@ -35,9 +36,7 @@ async def state_stream(ws: WebSocket) -> None:
     await ws.accept()
     ha = get_ha_client()
     try:
-        _, events = await ha.subscribe(
-            {"type": "subscribe_events", "event_type": "state_changed"}
-        )
+        _, events = await ha.subscribe({"type": "subscribe_events", "event_type": "state_changed"})
         async for event in events:
             if not _is_knx_state_event(event):
                 continue

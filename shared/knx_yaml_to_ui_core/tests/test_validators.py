@@ -1,12 +1,13 @@
 """Validators ensure entities pass minimum shape requirements before building."""
+
 import pytest
 
 from knx_yaml_to_ui_core.validators import (
-    UnsupportedFeature,
+    UnsupportedFeatureError,
     ValidationError,
+    reject_setpoint_shift,
     require_keys,
     validate_ga,
-    reject_setpoint_shift,
 )
 
 
@@ -35,6 +36,6 @@ def test_validate_ga_rejects_garbage() -> None:
 
 
 def test_reject_setpoint_shift_raises_unsupported_feature() -> None:
-    with pytest.raises(UnsupportedFeature) as exc:
+    with pytest.raises(UnsupportedFeatureError) as exc:
         reject_setpoint_shift({"setpoint_shift_address": "5/0/1"}, entity_label="Climate Diele")
     assert "setpoint_shift" in str(exc.value)

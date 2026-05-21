@@ -3,6 +3,7 @@
 Reads, lists, and atomically writes YAML files under a fixed root. Rejects
 any path that resolves outside the configured root (path-traversal defense).
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -45,9 +46,7 @@ class FsAdapter:
         path = self._resolve(name)
 
         def _write() -> None:
-            fd, tmp_name = tempfile.mkstemp(
-                prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
-            )
+            fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
             try:
                 with os.fdopen(fd, "wb") as fh:
                     fh.write(content)

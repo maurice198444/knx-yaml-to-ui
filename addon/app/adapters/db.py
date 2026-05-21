@@ -1,4 +1,5 @@
 """SQLite migration_history adapter — append-only, async via aiosqlite."""
+
 from __future__ import annotations
 
 import json
@@ -30,9 +31,7 @@ class DB:
             await conn.executescript(_SCHEMA)
             await conn.commit()
 
-    async def insert_row(
-        self, *, kind: str, payload: dict[str, Any], status: str
-    ) -> int:
+    async def insert_row(self, *, kind: str, payload: dict[str, Any], status: str) -> int:
         created_at = datetime.now(UTC).isoformat()
         async with aiosqlite.connect(self._path) as conn:
             cursor = await conn.execute(

@@ -1,4 +1,5 @@
 """FsAdapter — async read, list, atomic write of /config/knx YAML files."""
+
 from pathlib import Path
 
 import pytest

@@ -1,4 +1,5 @@
 """Entities router — list KNX entities + read one config."""
+
 from __future__ import annotations
 
 from typing import Annotated
@@ -33,7 +34,5 @@ async def list_entities(ha: HaDep) -> EntitiesResponse:
 
 @router.get("/{entity_id}", response_model=EntityConfigResponse)
 async def get_entity(entity_id: str, ha: HaDep) -> EntityConfigResponse:
-    config = await ha.send(
-        {"type": "knx/get_entity_config", "entity_id": entity_id}
-    )
+    config = await ha.send({"type": "knx/get_entity_config", "entity_id": entity_id})
     return EntityConfigResponse(entity_id=entity_id, config=config)

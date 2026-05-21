@@ -1,4 +1,5 @@
 """Convert router — dry-run + commit for one supported domain at a time."""
+
 from __future__ import annotations
 
 import logging
@@ -8,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from knx_yaml_to_ui_core.builders import BUILDERS
 from knx_yaml_to_ui_core.parser import ParseError, parse_yaml
 from knx_yaml_to_ui_core.types import ParsedDomains
-from knx_yaml_to_ui_core.validators import UnsupportedFeature, ValidationError
+from knx_yaml_to_ui_core.validators import UnsupportedFeatureError, ValidationError
 
 from ..adapters.db import DB
 from ..adapters.fs_adapter import FsAdapter, FsError
@@ -68,10 +69,8 @@ async def dry_run(req: DryRunRequest, fs: FsDep) -> DryRunResponse:
         name = yml.get("name", "<unnamed>")
         try:
             payload = builder(yml_dict)
-            entries.append(
-                DryRunEntry(name=name, payload=dict(payload), validation="ok")
-            )
-        except (ValidationError, UnsupportedFeature) as exc:
+            entries.append(DryRunEntry(name=name, payload=dict(payload), validation="ok"))
+        except (ValidationError, UnsupportedFeatureError) as exc:
             entries.append(
                 DryRunEntry(
                     name=name,
@@ -84,9 +83,7 @@ async def dry_run(req: DryRunRequest, fs: FsDep) -> DryRunResponse:
 
 
 @router.post("/commit", response_model=CommitResponse)
-async def commit(
-    req: CommitRequest, fs: FsDep, ha: HaDep, db: DbDep
-) -> CommitResponse:
+async def commit(req: CommitRequest, fs: FsDep, ha: HaDep, db: DbDep) -> CommitResponse:
     _ensure_supported(req.domain)
     parsed = await _load_and_parse(req.path, fs)
     builder = BUILDERS[req.domain]
@@ -99,16 +96,12 @@ async def commit(
             continue
         try:
             payload = builder(yml_dict)
-        except (ValidationError, UnsupportedFeature) as exc:
-            entries.append(
-                CommitResultEntry(name=name, applied=False, error=str(exc))
-            )
+        except (ValidationError, UnsupportedFeatureError) as exc:
+            entries.append(CommitResultEntry(name=name, applied=False, error=str(exc)))
             continue
         try:
             await ha.send({"type": "knx/validate_entity", **payload})
-            create_result = await ha.send(
-                {"type": "knx/create_entity", **payload}
-            )
+            create_result = await ha.send({"type": "knx/create_entity", **payload})
             entries.append(
                 CommitResultEntry(
                     name=name,
@@ -118,9 +111,7 @@ async def commit(
             )
         except HAClientError as exc:
             log.exception("commit failed for %s", name)
-            entries.append(
-                CommitResultEntry(name=name, applied=False, error=str(exc))
-            )
+            entries.append(CommitResultEntry(name=name, applied=False, error=str(exc)))
 
     migration_id = await db.insert_row(
         kind="convert.commit",

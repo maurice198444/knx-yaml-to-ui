@@ -1,4 +1,5 @@
 """TypedDict definitions for the pure core. No I/O, no runtime deps."""
+
 from typing import Any, NotRequired, TypedDict
 
 

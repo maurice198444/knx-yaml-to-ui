@@ -1,4 +1,5 @@
 """JSON log formatter — Bugfix #11 (no stdout-print leakage)."""
+
 from __future__ import annotations
 
 import json

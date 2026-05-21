@@ -1,4 +1,5 @@
 """Pure validators. Inputs are dicts; outputs are exceptions (or nothing)."""
+
 from __future__ import annotations
 
 import re
@@ -10,7 +11,7 @@ class ValidationError(ValueError):
     """Required key missing or wrong shape."""
 
 
-class UnsupportedFeature(ValueError):
+class UnsupportedFeatureError(ValueError):
     """YAML uses a feature we deliberately do not support in UI-config-store."""
 
 
@@ -21,9 +22,7 @@ def require_keys(d: dict[str, Any], keys: Iterable[str], *, entity_label: str) -
     """Raise ValidationError if any of the keys are missing or None."""
     missing = [k for k in keys if d.get(k) in (None, "")]
     if missing:
-        raise ValidationError(
-            f"{entity_label}: missing required keys {missing}"
-        )
+        raise ValidationError(f"{entity_label}: missing required keys {missing}")
 
 
 def validate_ga(value: str, *, field: str) -> None:
@@ -35,7 +34,7 @@ def validate_ga(value: str, *, field: str) -> None:
 def reject_setpoint_shift(yml: dict[str, Any], *, entity_label: str) -> None:
     """Bugfix-driven gate — setpoint_shift climates have no UI-config-store schema."""
     if "setpoint_shift_address" in yml or "setpoint_shift_state_address" in yml:
-        raise UnsupportedFeature(
+        raise UnsupportedFeatureError(
             f"{entity_label}: setpoint_shift climate is not supported in UI-config-store; "
             "keep this entity in YAML"
         )

@@ -4,6 +4,7 @@ The fake server speaks the HA-WS handshake (auth_required → auth_ok) and
 echoes structured replies. Lets us exercise reconnect, send/recv correlation,
 and timeout behavior without needing a real HA.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -51,9 +52,7 @@ class FakeHA:
             await ws.send(json.dumps(result))
             if msg.get("type", "").startswith("subscribe"):
                 for evt in self.events_after_subscribe:
-                    await ws.send(
-                        json.dumps({"id": mid, "type": "event", "event": evt})
-                    )
+                    await ws.send(json.dumps({"id": mid, "type": "event", "event": evt}))
 
 
 @pytest.fixture

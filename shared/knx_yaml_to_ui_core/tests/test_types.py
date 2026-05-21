@@ -1,4 +1,5 @@
 """Type shape assertions — these compile-time-pass via mypy --strict."""
+
 from knx_yaml_to_ui_core.types import ParsedDomains, ParsedEntity, UIEntityPayload
 
 

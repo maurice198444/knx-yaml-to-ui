@@ -1,4 +1,5 @@
 """Domain builders — pure functions YAML-dict → UIEntityPayload."""
+
 from .light import build_light
 
 BUILDERS = {

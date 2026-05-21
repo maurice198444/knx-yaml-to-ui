@@ -1,4 +1,5 @@
 """entities router — list + read KNX entities via HAClient."""
+
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -33,9 +34,7 @@ async def client(
         "data": {"entity": {"name": "Diele"}, "knx": {"ga_switch": {"write": "1/0/15"}}},
     }
     app = build_app(start_ha_client=False)
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
 

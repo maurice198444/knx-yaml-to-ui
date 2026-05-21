@@ -1,4 +1,5 @@
 """FastAPI entry point. `build_app(start_ha_client=...)` lets tests skip the WS lifecycle."""
+
 from __future__ import annotations
 
 from collections.abc import AsyncIterator

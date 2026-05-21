@@ -1,4 +1,5 @@
 """Migration-history SQLite adapter — append-only insert + list."""
+
 from pathlib import Path
 
 import pytest

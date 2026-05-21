@@ -1,4 +1,5 @@
 """Endpoints to list and parse YAML files in /config/knx/."""
+
 from __future__ import annotations
 
 from typing import Annotated

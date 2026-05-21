@@ -1,4 +1,5 @@
 """YAML-to-ParsedDomains parser. Pure: input bytes, output dict. No I/O."""
+
 from __future__ import annotations
 
 import yaml

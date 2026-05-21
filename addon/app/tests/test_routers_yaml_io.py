@@ -1,4 +1,5 @@
 """yaml_io router — list and parse YAML files under /config/knx."""
+
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -10,17 +11,13 @@ from app.main import build_app
 
 
 @pytest.fixture
-async def client(
-    tmp_knx_dir: Path, monkeypatch: pytest.MonkeyPatch
-) -> AsyncIterator[AsyncClient]:
+async def client(tmp_knx_dir: Path, monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[AsyncClient]:
     deps.get_fs_adapter.cache_clear()
     deps.get_db.cache_clear()
     monkeypatch.setattr(deps, "get_knx_root", lambda: tmp_knx_dir)
     monkeypatch.setattr(deps, "get_data_dir", lambda: tmp_knx_dir.parent)
     app = build_app(start_ha_client=False)
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
 

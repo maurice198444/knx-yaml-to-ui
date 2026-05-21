@@ -1,4 +1,5 @@
 """FastAPI dependencies — singletons created once per process."""
+
 from __future__ import annotations
 
 import os
@@ -13,9 +14,7 @@ from .adapters.ha_client import HAClient
 def get_supervisor_token() -> str:
     token = os.environ.get("SUPERVISOR_TOKEN")
     if not token:
-        raise RuntimeError(
-            "SUPERVISOR_TOKEN not set — Add-on must run under HA Supervisor"
-        )
+        raise RuntimeError("SUPERVISOR_TOKEN not set — Add-on must run under HA Supervisor")
     return token
 
 

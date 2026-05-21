@@ -5,6 +5,7 @@ the HA auth handshake on connect, multiplexes commands via incrementing `id`
 fields, and exposes `send(payload) -> result_dict`. Subscriptions get a
 separate channel via `subscribe()` which returns an async iterator of events.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -79,9 +80,7 @@ class HAClient:
             self._pending.pop(msg_id, None)
         return result
 
-    async def subscribe(
-        self, payload: dict[str, Any]
-    ) -> tuple[int, AsyncIterator[dict[str, Any]]]:
+    async def subscribe(self, payload: dict[str, Any]) -> tuple[int, AsyncIterator[dict[str, Any]]]:
         """Send subscription command. Returns (subscription_id, async-iter of events)."""
         if not self._ws:
             raise HAClientError("not connected")
@@ -127,9 +126,7 @@ class HAClient:
                 elif msg_type == "result" and msg.get("success") is False:
                     err = msg.get("error") or {}
                     future.set_exception(
-                        HAClientError(
-                            f"{err.get('code', 'unknown')}: {err.get('message', '')}"
-                        )
+                        HAClientError(f"{err.get('code', 'unknown')}: {err.get('message', '')}")
                     )
                 else:
                     future.set_exception(HAClientError(f"unexpected frame: {msg}"))

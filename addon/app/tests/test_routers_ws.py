@@ -1,4 +1,5 @@
 """ws router — forwards HA state_changed events filtered to KNX entities."""
+
 from __future__ import annotations
 
 import asyncio
@@ -21,9 +22,7 @@ class StreamingFakeHAClient(FakeHAClient):
         super().__init__()
         self.queued_events: list[dict[str, Any]] = []
 
-    async def subscribe(
-        self, payload: dict[str, Any]
-    ) -> tuple[int, AsyncIterator[dict[str, Any]]]:
+    async def subscribe(self, payload: dict[str, Any]) -> tuple[int, AsyncIterator[dict[str, Any]]]:
         events = list(self.queued_events)
 
         async def iterator() -> AsyncIterator[dict[str, Any]]:
@@ -35,9 +34,7 @@ class StreamingFakeHAClient(FakeHAClient):
 
 
 @pytest.fixture
-def streaming_client(
-    tmp_knx_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Any:
+def streaming_client(tmp_knx_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
     deps.get_fs_adapter.cache_clear()
     deps.get_db.cache_clear()
     monkeypatch.setattr(deps, "get_knx_root", lambda: tmp_knx_dir)

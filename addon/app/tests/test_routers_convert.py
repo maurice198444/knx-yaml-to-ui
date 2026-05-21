@@ -1,4 +1,5 @@
 """convert router — dry-run + commit for the light domain."""
+
 from collections.abc import AsyncIterator
 from pathlib import Path
 
@@ -24,18 +25,14 @@ async def client(
     monkeypatch.setattr(deps, "get_data_dir", lambda: tmp_path)
     deps.set_ha_client(fake_ha_client)  # type: ignore[arg-type]
     app = build_app(start_ha_client=False)
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         await deps.get_db().init()
         yield c
 
 
 @pytest.mark.asyncio
 async def test_dry_run_returns_one_entry_for_light(client: AsyncClient) -> None:
-    resp = await client.post(
-        "/api/convert/dry-run", json={"path": "light.yaml", "domain": "light"}
-    )
+    resp = await client.post("/api/convert/dry-run", json={"path": "light.yaml", "domain": "light"})
     assert resp.status_code == 200
     body = resp.json()
     assert body["domain"] == "light"
@@ -50,9 +47,7 @@ async def test_dry_run_returns_one_entry_for_light(client: AsyncClient) -> None:
 async def test_commit_sends_create_entity_to_ha(
     client: AsyncClient, fake_ha_client: FakeHAClient
 ) -> None:
-    resp = await client.post(
-        "/api/convert/commit", json={"path": "light.yaml", "domain": "light"}
-    )
+    resp = await client.post("/api/convert/commit", json={"path": "light.yaml", "domain": "light"})
     assert resp.status_code == 200
     body = resp.json()
     assert body["entries"][0]["entity_id"] == "light.diele"
@@ -64,9 +59,7 @@ async def test_commit_sends_create_entity_to_ha(
 
 @pytest.mark.asyncio
 async def test_commit_records_migration_row(client: AsyncClient) -> None:
-    resp = await client.post(
-        "/api/convert/commit", json={"path": "light.yaml", "domain": "light"}
-    )
+    resp = await client.post("/api/convert/commit", json={"path": "light.yaml", "domain": "light"})
     body = resp.json()
     rows = await deps.get_db().list_rows(limit=10)
     assert any(r["id"] == body["migration_id"] for r in rows)
@@ -77,9 +70,7 @@ async def test_commit_continues_on_per_entity_error(
     client: AsyncClient, fake_ha_client: FakeHAClient
 ) -> None:
     fake_ha_client.errors["knx/create_entity"] = "boom from HA"
-    resp = await client.post(
-        "/api/convert/commit", json={"path": "light.yaml", "domain": "light"}
-    )
+    resp = await client.post("/api/convert/commit", json={"path": "light.yaml", "domain": "light"})
     assert resp.status_code == 200
     body = resp.json()
     assert body["entries"][0]["applied"] is False
