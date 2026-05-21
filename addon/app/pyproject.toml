@@ -23,3 +23,15 @@ dev = [
 
 [tool.uv.sources]
 knx-yaml-to-ui-core = { path = "../../shared", editable = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true

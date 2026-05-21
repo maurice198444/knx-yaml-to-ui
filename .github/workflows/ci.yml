@@ -30,3 +30,45 @@ jobs:
         run: mypy knx_yaml_to_ui_core
       - name: Test (pytest)
         run: pytest --cov=knx_yaml_to_ui_core --cov-report=xml --cov-fail-under=85
+
+  addon-app:
+    name: addon/app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: addon/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: pip install uv
+      - name: Install deps
+        run: |
+          uv pip install --system ../../shared
+          uv pip install --system fastapi 'uvicorn[standard]' httpx websockets pyyaml
+          uv pip install --system pytest pytest-asyncio pytest-cov ruff mypy
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Format check (ruff)
+        run: ruff format --check .
+      - name: Type check (mypy)
+        run: mypy .
+
+  addon-docker:
+    name: addon/Dockerfile build (amd64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare shared copy
+        run: cp -r shared addon/shared
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f addon/Dockerfile \
+            --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base-python:3.12-alpine3.20 \
+            --build-arg BUILD_ARCH=amd64 \
+            --build-arg BUILD_VERSION=0.0.1 \
+            -t knx-yaml-to-ui:ci \
+            addon/
