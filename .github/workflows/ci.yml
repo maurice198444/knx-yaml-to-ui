@@ -49,12 +49,41 @@ jobs:
           uv pip install --system ../../shared
           uv pip install --system fastapi 'uvicorn[standard]' httpx websockets pyyaml
           uv pip install --system pytest pytest-asyncio pytest-cov ruff mypy
+      - name: Install addon runtime deps
+        run: |
+          uv pip install --system aiosqlite pydantic
       - name: Lint (ruff)
         run: ruff check .
       - name: Format check (ruff)
         run: ruff format --check .
       - name: Type check (mypy)
         run: mypy .
+
+  backend-integration:
+    name: Backend integration tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: addon/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: pip install uv
+      - name: Install deps
+        run: |
+          uv pip install --system ../../shared
+          uv pip install --system fastapi 'uvicorn[standard]' httpx websockets pyyaml aiosqlite
+          uv pip install --system pytest pytest-asyncio pytest-cov
+      - name: Run addon tests with coverage
+        run: |
+          pytest tests/ \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-fail-under=70 \
+            -v
 
   addon-docker:
     name: addon/Dockerfile build (amd64)
