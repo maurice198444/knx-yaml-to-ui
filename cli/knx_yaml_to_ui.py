@@ -53,7 +53,6 @@ import argparse
 import json
 import os
 import re
-import secrets
 import shutil
 import sys
 import time
@@ -65,6 +64,9 @@ except ImportError:
     print("ERROR: pyyaml required - pip install pyyaml", file=sys.stderr)
     sys.exit(1)
 
+from knx_yaml_to_ui_core.slugify import slugify
+from knx_yaml_to_ui_core.ulid import CROCKFORD, gen_ulid
+
 # ---------- config ----------
 HA_CONFIG_DIR = Path(os.environ.get("HA_CONFIG_DIR", "H:/"))
 CONFIG_STORE = HA_CONFIG_DIR / ".storage" / "knx" / "config_store.json"
@@ -72,8 +74,6 @@ ENTITY_REGISTRY = HA_CONFIG_DIR / ".storage" / "core.entity_registry"
 
 DOMAINS = ("light", "switch", "cover", "binary_sensor", "sensor", "climate",
            "time", "datetime", "scene")
-
-CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
 SENSOR_TYPE_TO_DPT = {
     "temperature": "9.001",
@@ -95,33 +95,14 @@ SENSOR_TYPE_TO_DPT = {
     "wind_speed": "9.005",
 }
 
-# ---------- ULID ----------
-
-def gen_ulid() -> str:
-    """Crockford Base32 ULID: 48-bit time + 80-bit random => 26 chars."""
-    ts_ms = int(time.time() * 1000)
-    raw = ts_ms.to_bytes(6, "big") + secrets.token_bytes(10)
-    n = int.from_bytes(raw, "big")
-    chars = []
-    for _ in range(26):
-        chars.append(CROCKFORD[n & 0x1F])
-        n >>= 5
-    return "".join(reversed(chars))
-
+# ---------- ULID wrapper ----------
 
 def ulid() -> str:
-    time.sleep(0.001)  # ensure monotonic
+    time.sleep(0.001)  # ensure monotonic across calls
     return f"knx_es_{gen_ulid()}"
 
 
 # ---------- helpers ----------
-
-def slugify(name: str) -> str:
-    s = name.lower()
-    s = re.sub(r"[^a-z0-9]+", "_", s)
-    s = re.sub(r"_+", "_", s).strip("_")
-    return s
-
 
 def to_sync_state(v):
     if isinstance(v, bool):
