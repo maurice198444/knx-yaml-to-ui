@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shared-core:
+    name: shared/knx_yaml_to_ui_core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shared
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: pip install uv
+      - name: Install package
+        run: uv pip install --system -e ".[dev]"
+      - name: Lint (ruff)
+        run: ruff check knx_yaml_to_ui_core
+      - name: Format check (ruff)
+        run: ruff format --check knx_yaml_to_ui_core
+      - name: Type check (mypy)
+        run: mypy knx_yaml_to_ui_core
+      - name: Test (pytest)
+        run: pytest --cov=knx_yaml_to_ui_core --cov-report=xml --cov-fail-under=85

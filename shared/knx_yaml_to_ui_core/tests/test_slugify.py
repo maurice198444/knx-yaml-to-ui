@@ -1,4 +1,5 @@
 """Tests for slugify — entity_id-safe slugs with German umlaut transliteration (Bugfix #3)."""
+
 import re
 
 import pytest

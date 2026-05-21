@@ -1,10 +1,18 @@
 """Entity-id-safe slug generation with German umlaut transliteration."""
+
 import re
 
-_UMLAUT_MAP = str.maketrans({
-    "ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
-    "Ä": "Ae", "Ö": "Oe", "Ü": "Ue",
-})
+_UMLAUT_MAP = str.maketrans(
+    {
+        "ä": "ae",
+        "ö": "oe",
+        "ü": "ue",
+        "ß": "ss",
+        "Ä": "Ae",
+        "Ö": "Oe",
+        "Ü": "Ue",
+    }
+)
 
 
 def slugify(name: str) -> str:

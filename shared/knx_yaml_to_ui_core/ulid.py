@@ -1,4 +1,5 @@
 """ULID generation in Crockford Base32 — 48-bit time + 80-bit random, 26 chars total."""
+
 import secrets
 import time
 
