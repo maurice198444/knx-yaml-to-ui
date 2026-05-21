@@ -17,6 +17,7 @@ HaDep = Annotated[HAClient, Depends(get_ha_client)]
 @router.get("", response_model=EntitiesResponse)
 async def list_entities(ha: HaDep) -> EntitiesResponse:
     result = await ha.send({"type": "config/entity_registry/list"})
+    raw_entries = result if isinstance(result, list) else result.get("entities", [])
     entries = [
         EntitySummary(
             entity_id=e["entity_id"],
@@ -24,7 +25,7 @@ async def list_entities(ha: HaDep) -> EntitiesResponse:
             platform=e.get("platform", ""),
             state=None,
         )
-        for e in result.get("entities", [])
+        for e in raw_entries
         if e.get("platform") == "knx"
     ]
     return EntitiesResponse(entities=entries)

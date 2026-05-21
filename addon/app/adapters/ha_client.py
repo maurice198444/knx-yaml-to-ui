@@ -63,11 +63,12 @@ class HAClient:
             await self._ws.close()
             self._ws = None
 
-    async def send(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def send(self, payload: dict[str, Any]) -> Any:
+        # HA WS "result" field can be a dict OR a list (e.g. config/entity_registry/list).
         if not self._ws:
             raise HAClientError("not connected")
         msg_id = next(self._id_seq)
-        future: asyncio.Future[dict[str, Any]] = asyncio.get_running_loop().create_future()
+        future: asyncio.Future[Any] = asyncio.get_running_loop().create_future()
         self._pending[msg_id] = future
         outbound = {"id": msg_id, **payload}
         async with self._lock:
@@ -120,7 +121,9 @@ class HAClient:
                 if future is None or future.done():
                     continue
                 if msg_type == "result" and msg.get("success") is True:
-                    future.set_result(msg.get("result") or {})
+                    # `or {}` would mangle empty lists to dicts — handle None explicitly.
+                    result_value = msg.get("result")
+                    future.set_result({} if result_value is None else result_value)
                 elif msg_type == "result" and msg.get("success") is False:
                     err = msg.get("error") or {}
                     future.set_exception(

@@ -23,13 +23,11 @@ async def client(
     monkeypatch.setattr(deps, "get_knx_root", lambda: tmp_knx_dir)
     monkeypatch.setattr(deps, "get_data_dir", lambda: tmp_path)
     deps.set_ha_client(fake_ha_client)  # type: ignore[arg-type]
-    fake_ha_client.results["config/entity_registry/list"] = {
-        "entities": [
-            {"entity_id": "light.diele", "platform": "knx", "name": "Diele"},
-            {"entity_id": "switch.steckdose", "platform": "knx", "name": "Steckdose"},
-            {"entity_id": "light.fremd", "platform": "hue", "name": "Hue"},
-        ]
-    }
+    fake_ha_client.results["config/entity_registry/list"] = [
+        {"entity_id": "light.diele", "platform": "knx", "name": "Diele"},
+        {"entity_id": "switch.steckdose", "platform": "knx", "name": "Steckdose"},
+        {"entity_id": "light.fremd", "platform": "hue", "name": "Hue"},
+    ]
     fake_ha_client.results["knx/get_entity_config"] = {
         "platform": "light",
         "data": {"entity": {"name": "Diele"}, "knx": {"ga_switch": {"write": "1/0/15"}}},
