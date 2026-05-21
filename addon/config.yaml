@@ -2,7 +2,7 @@ name: knx-yaml-to-ui
 version: "0.0.3"
 slug: knx_yaml_to_ui
 description: Convert and manage HA-KNX YAML configs as UI entities
-url: https://github.com/MauriceStockfleth/knx-yaml-to-ui
+url: https://github.com/maurice198444/knx-yaml-to-ui
 arch:
   - amd64
   - aarch64
