@@ -21,8 +21,13 @@ class _UIEntityEntityBlock(TypedDict):
     entity_category: str | None
 
 
+class _UIEntityDataBlock(TypedDict):
+    entity: _UIEntityEntityBlock
+    knx: dict[str, Any]  # domain-specific; light vs cover vs climate differ
+
+
 class UIEntityPayload(TypedDict):
     """Payload shape expected by `knx/create_entity` / `knx/validate_entity`."""
 
     platform: str
-    data: dict[str, Any]  # {"entity": _UIEntityEntityBlock, "knx": {...}}
+    data: _UIEntityDataBlock
