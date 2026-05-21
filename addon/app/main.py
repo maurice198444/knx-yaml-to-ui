@@ -14,7 +14,7 @@ from .deps import (
     set_ha_client,
 )
 from .logging_config import configure_logging
-from .routers import convert, entities, health, yaml_io
+from .routers import convert, entities, health, ws, yaml_io
 
 
 def build_app(*, start_ha_client: bool = True) -> FastAPI:
@@ -46,6 +46,7 @@ def build_app(*, start_ha_client: bool = True) -> FastAPI:
     app.include_router(yaml_io.router)
     app.include_router(convert.router)
     app.include_router(entities.router)
+    app.include_router(ws.router)
 
     @app.get("/api")
     async def root() -> dict[str, str]:
