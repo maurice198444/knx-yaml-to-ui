@@ -14,7 +14,7 @@ COPY app /app/app
 
 RUN pip install --no-cache-dir \
         /shared \
-        /app
+        /app/app
 
 COPY rootfs /
 
