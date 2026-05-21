@@ -21,6 +21,9 @@ dev = [
     "mypy>=1.11",
 ]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
 [tool.uv.sources]
 knx-yaml-to-ui-core = { path = "../../shared", editable = true }
 
