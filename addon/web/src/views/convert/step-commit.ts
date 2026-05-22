@@ -226,7 +226,7 @@ export class StepCommit extends LitElement {
         angelegt
       </p>
       <div class="preview">
-        <div>Folgende Entities werden in HA registriert:</div>
+        <div>Folgende Entitäten werden in die KNX Integration registriert:</div>
         <ul>
           ${names.map((n) => html`<li>• ${n}</li>`)}
         </ul>
