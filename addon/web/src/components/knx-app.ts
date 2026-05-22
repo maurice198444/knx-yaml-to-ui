@@ -41,6 +41,9 @@ export class KnxApp extends LitElement {
     };
     ws.addEventListener("status", onWsStatus);
     this.unsubWs = () => ws.removeEventListener("status", onWsStatus);
+    // WS is a singleton tied to app lifetime, not to any single view: the
+    // topbar status pill must reflect connection state on every tab.
+    ws.connect();
   }
 
   override disconnectedCallback() {
