@@ -1,0 +1,524 @@
+# Instincts generated from https://github.com/maurice198444/knx-yaml-to-ui
+# Generated: 2026-05-22T04:30:33.056Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: knx-yaml-to-ui-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, docs, chore
+
+## Evidence
+
+- 14 commits analyzed
+- Detected conventional commit pattern
+- Examples: docs: add Plan-03 frontend MVP design + mockups, feat(web): P1 — Lit+Vite skeleton, theme system, shell components
+
+---
+id: knx-yaml-to-ui-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Commit Length
+
+## Action
+
+Write moderate-length commit messages (~62 characters)
+
+## Evidence
+
+- Average commit message length: 62 chars
+- Based on 14 commits
+
+---
+id: knx-yaml-to-ui-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: knx-yaml-to-ui-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: knx-yaml-to-ui-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: 
+
+---
+id: knx-yaml-to-ui-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~26x per month
+- Files: addon/web/src/components/*, addon/web/src/components/ui/*, addon/web/src/*
+
+---
+id: knx-yaml-to-ui-workflow-frontend-feature-development
+trigger: "when doing frontend feature development"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Workflow Frontend Feature Development
+
+## Action
+
+Follow the frontend-feature-development workflow:
+1. Create or update view component(s) in addon/web/src/views/
+2. Add or update supporting UI components in addon/web/src/components/ or addon/web/src/components/ui/
+3. Update or create state management in addon/web/src/state/store.ts if needed
+4. Update or create API types/client in addon/web/src/api/types.ts and addon/web/src/api/client.ts if needed
+5. Update styles or theme files in addon/web/src/styles/ or addon/web/src/theme.ts if needed
+6. Test integration with backend if necessary
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: addon/web/src/views/*.ts, addon/web/src/components/**/*.ts, addon/web/src/state/store.ts
+
+---
+id: knx-yaml-to-ui-workflow-backend-api-extension-with-tests
+trigger: "when doing backend api extension with tests"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Workflow Backend Api Extension With Tests
+
+## Action
+
+Follow the backend-api-extension-with-tests workflow:
+1. Implement or update endpoint in addon/app/routers/*.py
+2. Update or create schema in addon/app/schemas.py if needed
+3. Add or update automated tests in addon/app/tests/test_routers_*.py
+4. Update API types in addon/web/src/api/types.ts if frontend uses the endpoint
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: addon/app/routers/*.py, addon/app/schemas.py, addon/app/tests/test_routers_*.py
+
+---
+id: knx-yaml-to-ui-workflow-frontend-ui-polish-or-redesign
+trigger: "when doing frontend ui polish or redesign"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Workflow Frontend Ui Polish Or Redesign
+
+## Action
+
+Follow the frontend-ui-polish-or-redesign workflow:
+1. Update view/component files in addon/web/src/views/ or addon/web/src/components/
+2. Update supporting UI elements in addon/web/src/components/ui/ if needed
+3. Adjust styles in addon/web/src/styles/ if needed
+4. Update translations or state logic if needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: addon/web/src/views/*.ts, addon/web/src/components/**/*.ts, addon/web/src/components/ui/*.ts
+
+---
+id: knx-yaml-to-ui-workflow-documentation-and-planning-update
+trigger: "when doing documentation and planning update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Workflow Documentation And Planning Update
+
+## Action
+
+Follow the documentation-and-planning-update workflow:
+1. Create or update markdown files in docs/active/webapp/
+2. Add or update mockup HTML files in docs/active/webapp/plan-03-mockups/
+3. Document smoke test procedures or plans
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: docs/active/webapp/*.md, docs/active/webapp/plan-03-mockups/*.html
+
+---
+id: knx-yaml-to-ui-instinct-file-naming
+trigger: "When creating or renaming files in the codebase"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct File Naming
+
+## Action
+
+Use camelCase for file names
+
+## Evidence
+
+- Pattern in namingConventions.files: camelCase
+
+---
+id: knx-yaml-to-ui-instinct-function-naming
+trigger: "When defining a new function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Function Naming
+
+## Action
+
+Use camelCase for function names
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: knx-yaml-to-ui-instinct-class-naming
+trigger: "When defining a new class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Class Naming
+
+## Action
+
+Use PascalCase for class names
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: knx-yaml-to-ui-instinct-constant-naming
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constants
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: knx-yaml-to-ui-instinct-import-style
+trigger: "When importing modules"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Import Style
+
+## Action
+
+Use a mixed import style (both default and named as appropriate)
+
+## Evidence
+
+- Pattern in importStyle: mixed
+
+---
+id: knx-yaml-to-ui-instinct-export-style
+trigger: "When exporting modules or functions"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: knx-yaml-to-ui-instinct-test-location
+trigger: "When adding tests"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Test Location
+
+## Action
+
+Place tests alongside source files or in dedicated test folders (mixed location)
+
+## Evidence
+
+- Pattern in architecture.testLocation: mixed
+
+---
+id: knx-yaml-to-ui-instinct-backend-test-pattern
+trigger: "When adding or updating backend API endpoints"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Backend Test Pattern
+
+## Action
+
+Add or update automated tests in addon/app/tests/test_routers_*.py
+
+## Evidence
+
+- backend-api-extension-with-tests workflow
+- Pattern in files: addon/app/tests/test_routers_*.py
+
+---
+id: knx-yaml-to-ui-instinct-frontend-feature-test-pattern
+trigger: "When implementing a new frontend feature"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Frontend Feature Test Pattern
+
+## Action
+
+Add or update tests for new feature components
+
+## Evidence
+
+- feature-development workflow includes test step
+- Pattern in files: **/*.test.*
+
+---
+id: knx-yaml-to-ui-instinct-commit-format
+trigger: "When writing a commit message"
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Commit Format
+
+## Action
+
+Use Conventional Commits format with prefixes: feat, fix, docs, chore
+
+## Evidence
+
+- Pattern in commits.prefixes: [feat, fix, docs, chore]
+- Examples: 'feat(web): ...', 'docs: ...', 'fix(web): ...'
+
+---
+id: knx-yaml-to-ui-instinct-commit-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Commit Length
+
+## Action
+
+Keep commit messages concise, around 62 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength: 62
+
+---
+id: knx-yaml-to-ui-instinct-frontend-feature-workflow
+trigger: "When adding a new user-facing feature or major UI section to the frontend"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Frontend Feature Workflow
+
+## Action
+
+Follow the frontend-feature-development workflow: update view components, supporting UI, state management, API types/client, styles/theme, and test integration with backend
+
+## Evidence
+
+- frontend-feature-development workflow
+- Examples: feat(web): P2 — Convert flow (tiles, stepper, 4 step components)
+
+---
+id: knx-yaml-to-ui-instinct-backend-api-workflow
+trigger: "When adding or extending a backend API endpoint"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Backend Api Workflow
+
+## Action
+
+Follow the backend-api-extension-with-tests workflow: update routers, schemas, tests, and API types
+
+## Evidence
+
+- backend-api-extension-with-tests workflow
+- Examples: feat(api): P3 backend prep — DELETE /api/entities/{id} + last_changed in state-stream
+
+---
+id: knx-yaml-to-ui-instinct-frontend-ui-polish-workflow
+trigger: "When improving the look, usability, or localization of an existing UI feature"
+confidence: 0.88
+domain: workflow
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Frontend Ui Polish Workflow
+
+## Action
+
+Follow the frontend-ui-polish-or-redesign workflow: update views/components, UI elements, styles, and translations/state logic as needed
+
+## Evidence
+
+- frontend-ui-polish-or-redesign workflow
+- Examples: fix(web): correct commit-step copy (Entitäten + KNX Integration)
+
+---
+id: knx-yaml-to-ui-instinct-docs-update-workflow
+trigger: "When documenting a new feature, design, or release process"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: maurice198444/knx-yaml-to-ui
+---
+
+# Knx Yaml To Ui Instinct Docs Update Workflow
+
+## Action
+
+Follow the documentation-and-planning-update workflow: update markdown docs, mockup HTML files, and smoke test procedures
+
+## Evidence
+
+- documentation-and-planning-update workflow
+- Examples: docs: add Plan-03 frontend MVP design + mockups
+
