@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knx Yaml To Ui"
+  short_description: "Repo-specific patterns and workflows for knx-yaml-to-ui"
+  default_prompt: "Use the knx-yaml-to-ui repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
