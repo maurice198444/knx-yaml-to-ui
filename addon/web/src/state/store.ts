@@ -15,6 +15,11 @@ import type {
 
 export type ConvertStep = "file" | "parse" | "dryrun" | "commit";
 
+export interface RecentCommit {
+  commit: CommitResponse;
+  capturedAt: number;
+}
+
 export interface AppState {
   selectedDomain: Domain;
   files: YamlFile[] | null;
@@ -22,7 +27,7 @@ export interface AppState {
   parseResult: YamlParseResponse | null;
   dryRunResult: DryRunResponse | null;
   lastCommit: CommitResponse | null;
-  recentCommits: CommitResponse[];
+  recentCommits: RecentCommit[];
   entities: EntitySummary[];
   currentStep: ConvertStep;
 }
@@ -91,9 +96,10 @@ export class Store extends EventTarget {
   }
 
   setLastCommit(commit: CommitResponse): void {
+    const entry: RecentCommit = { commit, capturedAt: Date.now() };
     this.set({
       lastCommit: commit,
-      recentCommits: [commit, ...this._state.recentCommits].slice(0, 50),
+      recentCommits: [entry, ...this._state.recentCommits].slice(0, 50),
     });
   }
 
