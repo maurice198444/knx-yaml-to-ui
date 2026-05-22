@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>KNX YAML — Mockup 3 · Dark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     MOCKUP 3 — "Dark"
+     Passend zum HA-Dark-Mode (#111418 Surfaces). Roboto wie HA,
+     ein kühler HA-Blau-Akzent, der im Dunkeln leuchtet aber nicht
+     schreit. Status-Farben gedämpft. Sitzt nahtlos im HA-Dark-iframe.
+  ============================================================ */
+  :root {
+    --accent: #38bdf8;            /* luminous but calm sky blue */
+    --accent-soft: rgba(56,189,248,.1);
+    --accent-line: rgba(56,189,248,.28);
+    --bg: #0e1116;                /* HA dark canvas */
+    --surface: #161a21;
+    --surface-2: #1c212a;
+    --border: #262c36;
+    --border-strong: #333b47;
+    --text: #e6e9ee;
+    --text-secondary: #99a2af;
+    --text-tertiary: #6a7280;
+
+    --ok: #4ade80;  --ok-bg: rgba(74,222,128,.12);
+    --err: #f87171; --err-bg: rgba(248,113,113,.12);
+    --warn: #fbbf24; --warn-bg: rgba(251,191,36,.12);
+
+    --font: "Roboto", -apple-system, "Segoe UI", sans-serif;
+    --mono: "Roboto Mono", ui-monospace, monospace;
+    --radius: 13px;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; font-family:var(--font); color:var(--text); background:var(--bg); line-height:1.5; font-size:15px; -webkit-font-smoothing:antialiased; }
+  .app { display:flex; flex-direction:column; min-height:100vh; }
+
+  header.topbar { background:var(--surface); border-bottom:1px solid var(--border); height:64px; display:flex; align-items:center; padding:0 26px; gap:18px; }
+  .brand { display:flex; align-items:center; gap:13px; }
+  .brand .logo { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,#0ea5e9,#38bdf8); display:grid; place-items:center; color:#06121c; font-weight:700; font-size:18px; box-shadow:0 0 18px -4px rgba(56,189,248,.5); }
+  .brand .name { font-size:18px; font-weight:500; }
+  .brand .ver { font-family:var(--mono); font-size:12px; color:var(--text-tertiary); }
+  nav.tabs { margin-left:auto; display:flex; gap:2px; }
+  nav.tabs button { font-family:inherit; font-size:14.5px; font-weight:500; border:0; background:none; color:var(--text-secondary); padding:8px 18px; border-radius:8px; cursor:pointer; transition:all .15s; }
+  nav.tabs button:hover { background:var(--surface-2); color:var(--text); }
+  nav.tabs button.active { background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent-line); }
+  .conn { display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--text-secondary); }
+  .conn .dot { width:7px; height:7px; border-radius:50%; background:var(--ok); animation:pulse 2.4s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)} 50%{box-shadow:0 0 0 5px rgba(74,222,128,0)} }
+
+  main { flex:1; padding:34px 26px 60px; max-width:1060px; margin:0 auto; width:100%; }
+  .tab-panel { display:none; } .tab-panel.active { display:block; animation:fade .3s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+  .heading { margin-bottom:30px; }
+  .heading .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:8px; }
+  .heading h1 { margin:0; font-size:31px; font-weight:500; letter-spacing:-.01em; }
+  .heading p { margin:8px 0 0; color:var(--text-secondary); font-size:15px; max-width:560px; }
+
+  /* Domain tiles */
+  .domains { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
+  .domain { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; cursor:pointer; transition:all .18s; position:relative; overflow:hidden; }
+  .domain:hover { border-color:var(--accent-line); transform:translateY(-2px); }
+  .domain:hover::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 80% 0%,var(--accent-soft),transparent 60%); pointer-events:none; }
+  .domain .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .domain .ico { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; background:var(--surface-2); color:var(--accent); border:1px solid var(--border); }
+  .domain .ico svg { width:22px; height:22px; }
+  .domain .count { font-family:var(--mono); font-size:26px; font-weight:500; line-height:1; }
+  .domain .title { font-size:16px; font-weight:500; }
+  .domain .status { font-size:13px; color:var(--text-secondary); margin-top:3px; }
+  .domain .status b { color:var(--ok); font-weight:500; }
+
+  /* Stepper */
+  .stepper { display:grid; grid-template-columns:repeat(4,1fr); position:relative; margin-bottom:38px; }
+  .stepper::before { content:""; position:absolute; top:25px; left:12.5%; right:12.5%; height:2px; background:var(--border-strong); }
+  .stepper::after { content:""; position:absolute; top:25px; left:12.5%; width:calc((var(--progress,3)-1)/3*75%); height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); transition:width .6s cubic-bezier(.4,0,.2,1); }
+  .step { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+  .step .circle { width:40px; height:40px; border-radius:50%; background:var(--surface); border:2px solid var(--border-strong); color:var(--text-tertiary); display:grid; place-items:center; font-family:var(--mono); font-weight:500; font-size:14px; margin-bottom:11px; transition:all .3s; }
+  .step .circle svg { width:15px; height:15px; }
+  .step.done .circle { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .step.active .circle { border-color:var(--accent); color:var(--accent); background:var(--surface); animation:glow 2.2s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.4),0 0 8px 0 rgba(56,189,248,.3)} 50%{box-shadow:0 0 0 8px rgba(56,189,248,0),0 0 22px 3px rgba(56,189,248,.55)} }
+  .step .label { font-size:14px; font-weight:500; color:var(--text-tertiary); }
+  .step.done .label,.step.active .label { color:var(--text); }
+  .step.active .label { color:var(--accent); }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:30px; }
+  .card h2 { margin:0 0 6px; font-size:23px; font-weight:500; }
+  .card .meta { color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
+  .card .meta code { font-family:var(--mono); font-size:13px; background:var(--bg); border:1px solid var(--border); padding:2px 8px; border-radius:6px; color:var(--text); }
+
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; padding:0 14px 13px; font-family:var(--mono); font-size:11px; font-weight:500; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.08em; border-bottom:1px solid var(--border-strong); }
+  td { padding:15px 14px; border-bottom:1px solid var(--border); font-size:14.5px; }
+  tbody tr:last-child td { border-bottom:0; }
+  tbody tr:hover { background:var(--surface-2); }
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:3px 11px; border-radius:7px; font-family:var(--mono); font-size:12px; font-weight:500; }
+  .pill .dot { width:6px; height:6px; border-radius:50%; }
+  .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.ok .dot{background:var(--ok)}
+  .pill.err{background:var(--err-bg);color:var(--err)} .pill.err .dot{background:var(--err)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.warn .dot{background:var(--warn)}
+  .mono { font-family:var(--mono); font-size:13px; color:var(--text-secondary); }
+  td.mono { color:var(--text); }
+  a.link { color:var(--accent); cursor:pointer; font-family:var(--mono); font-size:12px; text-decoration:none; border-bottom:1px solid transparent; } a.link:hover { border-bottom-color:var(--accent); }
+
+  .summary { margin:28px 0 4px; padding:26px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--accent-line); border-radius:var(--radius); display:flex; align-items:center; gap:26px; position:relative; overflow:hidden; }
+  .summary::before { content:""; position:absolute; left:0; top:18%; bottom:18%; width:3px; background:var(--accent); box-shadow:0 0 12px var(--accent); border-radius:0 3px 3px 0; }
+  .summary::after { content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; background:radial-gradient(circle,var(--accent-soft),transparent 70%); pointer-events:none; }
+  .summary .num { font-family:var(--mono); font-size:56px; font-weight:500; line-height:.9; color:var(--accent); text-shadow:0 0 20px rgba(56,189,248,.4); }
+  .summary h3 { margin:0 0 4px; font-size:18px; font-weight:500; }
+  .summary p { margin:0; color:var(--text-secondary); font-size:14px; max-width:470px; }
+
+  .actions { display:flex; justify-content:space-between; align-items:center; padding-top:26px; margin-top:26px; border-top:1px solid var(--border); }
+  .actions .right { display:flex; gap:8px; }
+  .btn { font-family:inherit; font-size:14.5px; font-weight:500; padding:11px 22px; border-radius:9px; cursor:pointer; border:1px solid transparent; transition:all .15s; }
+  .btn.primary { background:var(--accent); color:#06121c; }
+  .btn.primary:hover { background:#5ccbfa; transform:translateY(-1px); box-shadow:0 0 20px -2px rgba(56,189,248,.6); }
+  .btn.ghost { background:transparent; color:var(--text-secondary); border-color:var(--border-strong); }
+  .btn.ghost:hover { color:var(--text); border-color:var(--text-tertiary); background:var(--surface-2); }
+  .btn.text { background:transparent; color:var(--text-secondary); }
+  .btn.text:hover { color:var(--text); }
+
+  .card-head { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+  .card-head h2 { margin:0; }
+  .card-head .count { margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:7px; }
+  .card-head .count .dot { width:7px; height:7px; border-radius:50%; background:var(--ok); animation:pulse 2.4s infinite; }
+  .state { display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:13px; }
+  .state .dot { width:7px; height:7px; border-radius:50%; }
+  .state.on{color:var(--ok)} .state.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .state.off{color:var(--text-tertiary)} .state.off .dot{background:var(--border-strong)}
+  input[type=checkbox]{appearance:none;width:16px;height:16px;border:2px solid var(--border-strong);border-radius:4px;cursor:pointer;position:relative;background:var(--bg)}
+  input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+  input[type=checkbox]:checked::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid #06121c;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .card-foot { display:flex; gap:8px; margin-top:22px; padding-top:18px; border-top:1px solid var(--border); }
+
+  @media (max-width:760px){ .domains{grid-template-columns:repeat(2,1fr)} .heading h1{font-size:26px} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">K</div><div class="name">KNX YAML</div><div class="ver">v0.0.3</div></div>
+    <nav class="tabs">
+      <button class="active" data-tab="convert">Convert</button>
+      <button data-tab="entities">Entities</button>
+      <button data-tab="history">History</button>
+    </nav>
+    <div class="conn"><span class="dot"></span>online · 1h 33m</div>
+  </header>
+
+  <main>
+    <!-- CONVERT -->
+    <section class="tab-panel active" id="tab-convert">
+      <div class="heading">
+        <div class="eyebrow">Workspace · Convert</div>
+        <h1>YAML zu UI-Entities migrieren</h1>
+        <p>Schrittweise Konvertierung mit Dry-Run-Validierung. Keine Datei wird verändert.</p>
+      </div>
+
+      <div class="domains">
+        <div class="domain">
+          <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></div><div class="count">5</div></div>
+          <div class="title">Licht</div><div class="status"><b>3 an</b> · 5 gesamt</div>
+        </div>
+        <div class="domain">
+          <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div><div class="count">23</div></div>
+          <div class="title">Sensoren</div><div class="status">23 aktiv</div>
+        </div>
+        <div class="domain">
+          <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 14h18M3 19h18"/></svg></div><div class="count">8</div></div>
+          <div class="title">Rolladen</div><div class="status">8 gesamt</div>
+        </div>
+        <div class="domain">
+          <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div><div class="count">6</div></div>
+          <div class="title">Heizung</div><div class="status"><b>21.5°C</b> ⌀</div>
+        </div>
+      </div>
+
+      <div class="stepper" style="--progress:3;">
+        <div class="step done"><div class="circle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l3 3 7-7"/></svg></div><div class="label">Datei</div></div>
+        <div class="step done"><div class="circle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l3 3 7-7"/></svg></div><div class="label">Parsen</div></div>
+        <div class="step active"><div class="circle">3</div><div class="label">Dry-Run</div></div>
+        <div class="step"><div class="circle">4</div><div class="label">Commit</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Dry-Run-Ergebnis prüfen</h2>
+        <div class="meta">Datei <code>/config/knx/light_test.yaml</code> · Domain <code>light</code> · 3 Entities erkannt</div>
+        <table>
+          <thead><tr><th style="width:42%">Name</th><th style="width:18%">Status</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>Plan02 Smoke Diele</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td><a class="link">payload anzeigen →</a></td></tr>
+            <tr><td>Climate Bad <span class="mono" style="color:var(--text-tertiary)">(setpoint_shift)</span></td><td><span class="pill err"><span class="dot"></span>error</span></td><td style="color:var(--err);font-family:var(--mono);font-size:12px">unsupported feature: setpoint_shift</td></tr>
+            <tr><td>Switch Steckdose</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td><a class="link">payload anzeigen →</a></td></tr>
+          </tbody>
+        </table>
+        <div class="summary">
+          <div class="num">2</div>
+          <div><h3>Bereit zum Commit</h3><p>Zwei Entities werden als UI-Config-Store-Einträge angelegt. Eine wird übersprungen (Feature-Limitation).</p></div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost">← Zurück</button>
+          <div class="right"><button class="btn text">Abbrechen</button><button class="btn primary">2 Entities committen →</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTITIES -->
+    <section class="tab-panel" id="tab-entities">
+      <div class="heading"><div class="eyebrow">Workspace · Entities</div><h1>Registrierte Entities</h1></div>
+      <div class="card">
+        <div class="card-head"><h2>KNX Entities</h2><span class="count"><span class="dot"></span>live · 3 entities</span></div>
+        <table>
+          <thead><tr><th style="width:38px"><input type="checkbox"></th><th>Entity ID</th><th>State</th><th>Source</th><th>Last update</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox"></td><td class="mono">light.plan02_smoke_diele</td><td><span class="state on"><span class="dot"></span>on</span></td><td><span class="pill ok"><span class="dot"></span>ui_store</span></td><td class="mono">12:04:18</td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">light.plan02_smoke_diele_2</td><td><span class="state off"><span class="dot"></span>off</span></td><td><span class="pill ok"><span class="dot"></span>ui_store</span></td><td class="mono">12:03:55</td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">switch.steckdose</td><td><span class="state on"><span class="dot"></span>on</span></td><td><span class="pill warn"><span class="dot"></span>yaml</span></td><td class="mono">11:58:02</td></tr>
+          </tbody>
+        </table>
+        <div class="card-foot"><button class="btn ghost">↻ Refresh</button><button class="btn text" style="margin-left:auto;color:var(--err)">Delete selected</button></div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="tab-panel" id="tab-history">
+      <div class="heading"><div class="eyebrow">Audit · History</div><h1>Migration History</h1></div>
+      <div class="card">
+        <div class="card-head"><h2>Recent operations</h2><span class="count">12 entries</span></div>
+        <table>
+          <thead><tr><th style="width:40px">#</th><th>Time</th><th>Kind</th><th>Status</th><th>Entries</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">03</td><td class="mono">2026-05-22 12:04:11</td><td class="mono">convert.commit</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td>1 applied</td></tr>
+            <tr><td class="mono">02</td><td class="mono">2026-05-22 11:58:02</td><td class="mono">convert.commit</td><td><span class="pill warn"><span class="dot"></span>partial</span></td><td>1/2 applied</td></tr>
+            <tr><td class="mono">01</td><td class="mono">2026-05-22 11:42:20</td><td class="mono">convert.commit</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td>0 entries</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    b.classList.add('active'); document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+  }));
+  document.querySelectorAll('.stepper .step').forEach((step,idx)=>step.addEventListener('click',()=>{
+    const s=step.closest('.stepper'); s.querySelectorAll('.step').forEach((el,i)=>{el.classList.remove('active','done'); if(i<idx)el.classList.add('done'); if(i===idx)el.classList.add('active');});
+    s.style.setProperty('--progress',idx+1);
+  }));
+</script>
+</body>
+</html>

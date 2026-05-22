@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>Mockup 07 — Topbar Icons + Light/Dark + Wizard</title>
+<style>
+  /* LIGHT THEME (default) */
+  :root, [data-theme="light"] {
+    --primary: #5e35b1;
+    --primary-light: #7e57c2;
+    --wizard: #e65100;
+    --wizard-light: #f57c00;
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #fafafa;
+    --topbar: #ffffff;
+    --topbar-text: #1a1a24;
+    --topbar-icon: #6b6b7b;
+    --topbar-active-bg: rgba(94,53,177,.12);
+    --topbar-active-fg: #5e35b1;
+    --border: #e4e6ea;
+    --text: #1a1a24;
+    --text-secondary: #6b6b7b;
+    --success: #00bfa5;
+    --error: #e53935;
+    --warning: #fb8c00;
+    --shadow: 0 2px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+    --backdrop: rgba(20,20,30,.5);
+  }
+
+  /* DARK THEME */
+  [data-theme="dark"] {
+    --primary: #b39ddb;
+    --primary-light: #d1c4e9;
+    --wizard: #ffb74d;
+    --wizard-light: #ffcc80;
+    --bg: #0f1115;
+    --surface: #1c1f24;
+    --surface-2: #252930;
+    --topbar: #1c1f24;
+    --topbar-text: #e8eaed;
+    --topbar-icon: #9aa0a6;
+    --topbar-active-bg: rgba(179,157,219,.18);
+    --topbar-active-fg: #b39ddb;
+    --border: #2e333b;
+    --text: #e8eaed;
+    --text-secondary: #9aa0a6;
+    --success: #66bb6a;
+    --error: #ef5350;
+    --warning: #ffa726;
+    --shadow: 0 2px 6px rgba(0,0,0,0.3);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.45);
+    --backdrop: rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.5; transition: background-color .25s, color .25s; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* TOPBAR */
+  header.topbar {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--topbar); color: var(--topbar-text);
+    padding: 0 16px; height: 60px;
+    border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding-right: 16px; border-right: 1px solid var(--border); margin-right: 4px; }
+  .brand .logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--wizard)); border-radius: 8px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 14px; }
+  .brand .text { display: flex; flex-direction: column; }
+  .brand .title { font-weight: 600; font-size: 15px; }
+  .brand .version { color: var(--text-secondary); font-size: 11px; font-family: ui-monospace, monospace; }
+
+  nav.icons { display: flex; gap: 2px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px;
+    color: var(--topbar-icon); cursor: pointer; font-size: 14px; font-weight: 500;
+    background: none; border: 0; font-family: inherit; transition: all .15s; position: relative;
+  }
+  .nav-btn:hover { background: var(--surface-2); color: var(--text); }
+  .nav-btn.active { background: var(--topbar-active-bg); color: var(--topbar-active-fg); font-weight: 600; }
+  .nav-btn .icon { font-size: 16px; }
+  .nav-btn .badge { background: var(--topbar-icon); color: var(--topbar); padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+  .nav-btn.active .badge { background: var(--topbar-active-fg); color: var(--surface); }
+
+  .wizard-cta {
+    margin-left: 8px;
+    background: linear-gradient(135deg, var(--wizard), var(--wizard-light)) !important;
+    color: #fff !important;
+  }
+  .wizard-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(230,81,0,.3); }
+  [data-theme="dark"] .wizard-cta { color: #1c1f24 !important; }
+
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 8px; border: 0; background: none; cursor: pointer;
+    color: var(--topbar-icon); display: grid; place-items: center; font-size: 18px; transition: all .15s;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .status-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 14px; background: var(--surface-2); font-size: 12px; color: var(--text-secondary); }
+  .status-chip .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 6px var(--success); }
+
+  /* MAIN */
+  main.workspace { flex: 1; overflow: auto; padding: 24px 32px; }
+  .workspace-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+  .workspace-header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  .workspace-header .breadcrumb { color: var(--text-secondary); font-size: 13px; }
+
+  .card { background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
+  button.btn { background: var(--primary); color: var(--surface); border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; font-family: inherit; transition: all .15s; }
+  [data-theme="dark"] button.btn { color: #1c1f24; }
+  button.btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+  button.btn.secondary { background: transparent; color: var(--primary); border: 1px solid var(--border); }
+  button.btn.secondary:hover { background: var(--topbar-active-bg); }
+  button.btn.wizard { background: linear-gradient(135deg, var(--wizard), var(--wizard-light)); color: #fff; }
+  [data-theme="dark"] button.btn.wizard { color: #1c1f24; }
+  button.btn.wizard:hover { box-shadow: 0 4px 12px rgba(230,81,0,.3); }
+  button.btn.success { background: var(--success); color: #fff; }
+  button.btn.danger { background: var(--error); color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--surface-2); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+  .pill.ok { background: rgba(0,191,165,.14); color: var(--success); }
+  .pill.err { background: rgba(229,57,53,.14); color: var(--error); }
+  .pill.warn { background: rgba(251,140,0,.14); color: var(--warning); }
+  .mono { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; font-size: 13px; }
+  .state-on { color: var(--success); font-weight: 600; }
+  .state-off { color: var(--text-secondary); }
+  .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite; margin-right: 6px; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* WIZARD MODAL */
+  .wizard-backdrop { display: none; position: fixed; inset: 0; background: var(--backdrop); backdrop-filter: blur(4px); z-index: 100; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow: auto; }
+  .wizard-backdrop.open { display: flex; }
+  .wizard-modal { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-lg); max-width: 880px; width: 100%; overflow: hidden; animation: slideUp .3s ease-out; border: 1px solid var(--border); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .wizard-head { background: linear-gradient(135deg, var(--wizard), var(--wizard-light)); color: #fff; padding: 18px 24px; display: flex; align-items: center; gap: 12px; }
+  [data-theme="dark"] .wizard-head { color: #1c1f24; }
+  .wizard-head .icon { font-size: 20px; }
+  .wizard-head .title { font-weight: 600; font-size: 16px; flex: 1; }
+  .wizard-head .close { background: rgba(255,255,255,.2); color: inherit; border: 0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: 700; }
+  .wizard-head .close:hover { background: rgba(255,255,255,.32); }
+
+  .stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 24px 32px 16px; position: relative; background: var(--surface-2); }
+  .stepper::before { content: ""; position: absolute; top: 44px; left: 16%; right: 16%; height: 3px; background: var(--border); z-index: 0; }
+  .step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .step .circle { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 3px solid var(--border); color: var(--text-secondary); display: grid; place-items: center; font-weight: 700; font-size: 14px; margin-bottom: 6px; transition: all .2s; }
+  .step.done .circle { background: var(--success); border-color: var(--success); color: #fff; }
+  .step.active .circle { background: var(--wizard); border-color: var(--wizard); color: #fff; box-shadow: 0 0 0 5px rgba(230,81,0,.18); }
+  [data-theme="dark"] .step.active .circle { color: #1c1f24; box-shadow: 0 0 0 5px rgba(255,183,77,.18); }
+  .step .label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+  .step.done .label, .step.active .label { color: var(--text); }
+  .step.active .label { color: var(--wizard); }
+
+  .wizard-body { padding: 24px 32px; }
+  .wizard-body h2 { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+  .wizard-body .step-desc { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+  .confirm-box { background: rgba(230,81,0,.06); border: 2px solid var(--wizard); border-radius: 12px; padding: 18px; text-align: center; margin-top: 12px; }
+  [data-theme="dark"] .confirm-box { background: rgba(255,183,77,.08); }
+  .confirm-box .num { font-size: 32px; font-weight: 800; color: var(--wizard); line-height: 1; margin: 6px 0; }
+  .confirm-box p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+  .wizard-actions { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-top: 1px solid var(--border); background: var(--surface-2); }
+  .wizard-actions .right { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div class="text">
+        <div class="title">KNX YAML</div>
+        <div class="version">v0.0.3</div>
+      </div>
+    </div>
+
+    <nav class="icons">
+      <button class="nav-btn active" data-panel="files"><span class="icon">📁</span>Files<span class="badge">4</span></button>
+      <button class="nav-btn wizard-cta" id="open-wizard"><span class="icon">🪄</span>Convert</button>
+      <button class="nav-btn" data-panel="entities"><span class="icon">🔌</span>Entities<span class="badge">3</span></button>
+      <button class="nav-btn" data-panel="history"><span class="icon">📜</span>History<span class="badge">12</span></button>
+    </nav>
+
+    <div class="topbar-right">
+      <div class="status-chip"><div class="dot"></div>backend</div>
+      <button class="icon-btn" id="theme-toggle" title="Theme">🌙</button>
+      <button class="icon-btn" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- FILES -->
+    <section class="panel active" id="panel-files">
+      <div class="workspace-header">
+        <div>
+          <div class="breadcrumb">Workspace / Files</div>
+          <h1>YAML Files</h1>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn secondary">+ New file</button>
+          <button class="btn wizard" onclick="openWizard()">🪄 Convert YAML →</button>
+        </div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>File</th><th>Domain</th><th>Entities</th><th>Last modified</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="mono">light_test.yaml</td><td>light</td><td>1</td><td class="mono">2026-05-22 11:42</td><td><button class="btn wizard" style="padding:4px 12px;font-size:12px;" onclick="openWizard()">Convert →</button></td></tr>
+            <tr><td class="mono">klima.yaml</td><td>climate</td><td>5</td><td class="mono">2026-05-20 09:18</td><td><button class="btn wizard" style="padding:4px 12px;font-size:12px;" onclick="openWizard()">Convert →</button></td></tr>
+            <tr><td class="mono">sensor.yaml</td><td>sensor</td><td>23</td><td class="mono">2026-05-19 22:04</td><td><button class="btn wizard" style="padding:4px 12px;font-size:12px;" onclick="openWizard()">Convert →</button></td></tr>
+            <tr><td class="mono">cover.yaml</td><td>cover</td><td>8</td><td class="mono">2026-05-18 14:30</td><td><button class="btn wizard" style="padding:4px 12px;font-size:12px;" onclick="openWizard()">Convert →</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ENTITIES -->
+    <section class="panel" id="panel-entities">
+      <div class="workspace-header">
+        <div>
+          <div class="breadcrumb">Workspace / Entities</div>
+          <h1>KNX Entities <span style="font-size:14px;color:var(--text-secondary);font-weight:400;"><span class="live-dot"></span>live</span></h1>
+        </div>
+        <button class="btn danger" style="opacity:.5;">Delete selected</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th><input type="checkbox" /></th><th>Entity ID</th><th>State</th><th>Source</th><th>Last update</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" /></td><td class="mono">light.plan02_smoke_diele</td><td class="state-on">● on</td><td><span class="pill ok">ui_store</span></td><td class="mono">12:04:18</td></tr>
+            <tr><td><input type="checkbox" /></td><td class="mono">light.plan02_smoke_diele_2</td><td class="state-off">○ off</td><td><span class="pill ok">ui_store</span></td><td class="mono">12:03:55</td></tr>
+            <tr><td><input type="checkbox" /></td><td class="mono">switch.steckdose</td><td class="state-on">● on</td><td><span class="pill warn">yaml</span></td><td class="mono">11:58:02</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="panel" id="panel-history">
+      <div class="workspace-header">
+        <div>
+          <div class="breadcrumb">Audit / History</div>
+          <h1>Migration History</h1>
+        </div>
+        <div style="color:var(--text-secondary);font-size:14px;">12 entries</div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>#</th><th>Time</th><th>Kind</th><th>Status</th><th>Entries</th></tr></thead>
+          <tbody>
+            <tr><td>3</td><td class="mono">2026-05-22 12:04:11</td><td class="mono">convert.commit</td><td><span class="pill ok">ok</span></td><td>1 applied</td></tr>
+            <tr><td>2</td><td class="mono">2026-05-22 11:58:02</td><td class="mono">convert.commit</td><td><span class="pill warn">partial</span></td><td>1/2 applied</td></tr>
+            <tr><td>1</td><td class="mono">2026-05-22 11:42:20</td><td class="mono">convert.commit</td><td><span class="pill ok">ok</span></td><td>0 entries</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- WIZARD MODAL -->
+<div class="wizard-backdrop" id="wizard">
+  <div class="wizard-modal">
+    <div class="wizard-head">
+      <div class="icon">🪄</div>
+      <div class="title">Convert: light_test.yaml → UI-Entities</div>
+      <button class="close" onclick="closeWizard()">×</button>
+    </div>
+    <div class="stepper">
+      <div class="step done"><div class="circle">✓</div><div class="label">Datei</div></div>
+      <div class="step done"><div class="circle">✓</div><div class="label">Parsen</div></div>
+      <div class="step active"><div class="circle">3</div><div class="label">Dry-Run</div></div>
+      <div class="step"><div class="circle">4</div><div class="label">Commit</div></div>
+    </div>
+    <div class="wizard-body">
+      <h2>Dry-Run-Ergebnis prüfen</h2>
+      <div class="step-desc">Domain <strong>light</strong> · 3 Entities erkannt · 2 bereit, 1 mit Fehler.</div>
+      <table>
+        <thead><tr><th>Name</th><th>Status</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Plan02 Smoke Diele</td><td><span class="pill ok">● ok</span></td><td><a style="color:var(--wizard);font-size:12px;cursor:pointer;font-weight:600;">show JSON</a></td></tr>
+          <tr><td>Climate Bad (setpoint_shift)</td><td><span class="pill err">● error</span></td><td style="color:var(--error);font-size:12px;">unsupported feature: setpoint_shift</td></tr>
+          <tr><td>Switch Steckdose</td><td><span class="pill ok">● ok</span></td><td><a style="color:var(--wizard);font-size:12px;cursor:pointer;font-weight:600;">show JSON</a></td></tr>
+        </tbody>
+      </table>
+      <div class="confirm-box">
+        <div class="num">2</div>
+        <p>Entities werden als UI-Config-Store-Einträge in HA angelegt. 1 wird übersprungen.</p>
+      </div>
+    </div>
+    <div class="wizard-actions">
+      <button class="btn secondary">← Zurück</button>
+      <div class="right">
+        <button class="btn secondary" onclick="closeWizard()">Abbrechen</button>
+        <button class="btn success">✓ 2 Entities committen →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab/panel switching
+  document.querySelectorAll('.nav-btn[data-panel]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn[data-panel]').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById('panel-' + b.dataset.panel).classList.add('active');
+    });
+  });
+
+  // Wizard
+  function openWizard() { document.getElementById('wizard').classList.add('open'); }
+  function closeWizard() { document.getElementById('wizard').classList.remove('open'); }
+  document.getElementById('open-wizard').addEventListener('click', openWizard);
+  document.getElementById('wizard').addEventListener('click', e => { if (e.target.id === 'wizard') closeWizard(); });
+
+  // Theme toggle (persists to localStorage)
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('theme-toggle');
+  const stored = localStorage.getItem('knx-yaml-theme');
+  if (stored) root.setAttribute('data-theme', stored);
+  function syncIcon() { themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; }
+  syncIcon();
+  themeBtn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('knx-yaml-theme', next);
+    syncIcon();
+  });
+</script>
+</body>
+</html>

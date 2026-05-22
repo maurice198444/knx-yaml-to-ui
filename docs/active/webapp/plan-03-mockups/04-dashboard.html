@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Mockup 04 — Single-Page Dashboard</title>
+<style>
+  :root {
+    --primary: #0ea5e9;
+    --primary-dark: #0284c7;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-secondary: #64748b;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.5; }
+
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  header.topbar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface); color: var(--text);
+    padding: 0 24px; height: 64px;
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  }
+  header.topbar .logo { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: grid; place-items: center; color: #fff; font-weight: 700; }
+  header.topbar .title { font-size: 16px; font-weight: 600; }
+  header.topbar .version { font-size: 12px; color: var(--text-secondary); font-family: ui-monospace, monospace; }
+  header.topbar .anchor-nav { margin-left: auto; display: flex; gap: 4px; }
+  header.topbar .anchor-nav a { padding: 8px 14px; border-radius: 6px; color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; }
+  header.topbar .anchor-nav a:hover { background: var(--bg); color: var(--text); }
+
+  main { padding: 24px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+  .hero {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: #fff; border-radius: 12px; padding: 24px 28px; margin-bottom: 24px;
+    display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center;
+  }
+  .hero h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+  .hero p { margin: 0; opacity: .9; font-size: 14px; }
+  .hero .kpi-row { display: flex; gap: 32px; }
+  .hero .kpi .num { font-size: 28px; font-weight: 700; line-height: 1; }
+  .hero .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .8; }
+
+  .section { margin-bottom: 32px; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; padding: 0 4px; }
+  .section-head h2 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -.2px; }
+  .section-head .count { color: var(--text-secondary); font-size: 13px; }
+  .section-head .actions { margin-left: auto; display: flex; gap: 8px; }
+
+  .card { background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+
+  /* Files compact list */
+  .files-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .file-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .15s; }
+  .file-card:hover { border-color: var(--primary); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .file-card .fname { font-family: ui-monospace, monospace; font-weight: 600; font-size: 13px; }
+  .file-card .fmeta { font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; justify-content: space-between; }
+
+  /* Two-col split for Convert + Entities */
+  .split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; }
+  @media (max-width: 1000px) { .split { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--bg); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 13px; }
+  tbody tr:hover { background: var(--bg); }
+  .pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .pill.ok { background: rgba(16,185,129,.12); color: var(--success); }
+  .pill.err { background: rgba(239,68,68,.12); color: var(--error); }
+  .pill.warn { background: rgba(245,158,11,.16); color: var(--warning); }
+  .mono { font-family: ui-monospace, monospace; }
+  .state-on { color: var(--success); font-weight: 600; }
+  .state-off { color: var(--text-secondary); }
+  .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+  button.btn { background: var(--primary); color: #fff; border: 0; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; font-family: inherit; }
+  button.btn:hover { background: var(--primary-dark); }
+  button.btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
+  button.btn.secondary:hover { background: var(--bg); border-color: var(--primary); }
+  button.btn.danger { background: var(--error); }
+  button.btn.success { background: var(--success); }
+
+  .card-inner { padding: 16px 18px; }
+  .summary-strip { display: flex; gap: 16px; padding: 12px 18px; background: var(--bg); border-top: 1px solid var(--border); align-items: center; }
+  .summary-strip .stats { font-size: 13px; color: var(--text-secondary); flex: 1; }
+  .summary-strip .stats strong { color: var(--success); }
+
+  .history-card table tr { cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo">K</div>
+    <div>
+      <div class="title">KNX YAML</div>
+      <div class="version">v0.0.3 · Dashboard</div>
+    </div>
+    <nav class="anchor-nav">
+      <a href="#files">Files</a>
+      <a href="#convert">Convert</a>
+      <a href="#entities">Entities</a>
+      <a href="#history">History</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h2>Backend online · 12:05:42</h2>
+        <p>2 active conversions · 3 KNX-Entities live · letzter Commit vor 4 Min.</p>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="num">4</div><div class="label">Files</div></div>
+        <div class="kpi"><div class="num">3</div><div class="label">Entities</div></div>
+        <div class="kpi"><div class="num">12</div><div class="label">Migrations</div></div>
+      </div>
+    </div>
+
+    <!-- FILES -->
+    <section class="section" id="files">
+      <div class="section-head">
+        <h2>YAML Files</h2>
+        <span class="count">/config/knx · 4 Dateien</span>
+        <div class="actions"><button class="btn secondary">↻ Reload</button><button class="btn">+ New file</button></div>
+      </div>
+      <div class="files-row">
+        <div class="file-card"><div class="fname">light_test.yaml</div><div class="fmeta"><span>light · 1 entity</span><span>84 B</span></div></div>
+        <div class="file-card"><div class="fname">klima.yaml</div><div class="fmeta"><span>climate · 5</span><span>1.2 KB</span></div></div>
+        <div class="file-card"><div class="fname">sensor.yaml</div><div class="fmeta"><span>sensor · 23</span><span>4.8 KB</span></div></div>
+        <div class="file-card"><div class="fname">cover.yaml</div><div class="fmeta"><span>cover · 8</span><span>1.6 KB</span></div></div>
+      </div>
+    </section>
+
+    <!-- CONVERT + ENTITIES SPLIT -->
+    <div class="split">
+      <section class="section" id="convert" style="margin:0;">
+        <div class="section-head"><h2>Convert Workflow</h2><span class="count">light_test.yaml</span></div>
+        <div class="card">
+          <div class="card-inner">
+            <table>
+              <thead><tr><th>Name</th><th>Status</th><th>Detail</th></tr></thead>
+              <tbody>
+                <tr><td>Plan02 Smoke Diele</td><td><span class="pill ok">ok</span></td><td><a style="color:var(--primary);font-size:12px;cursor:pointer;">show JSON</a></td></tr>
+                <tr><td>Climate Bad (setpoint_shift)</td><td><span class="pill err">error</span></td><td style="color:var(--error);font-size:12px;">unsupported feature</td></tr>
+                <tr><td>Switch Steckdose</td><td><span class="pill ok">ok</span></td><td><a style="color:var(--primary);font-size:12px;cursor:pointer;">show JSON</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="summary-strip">
+            <div class="stats"><strong>2 ok</strong> · 1 error · 0 skipped</div>
+            <button class="btn secondary">Dry-Run again</button>
+            <button class="btn success">✓ Commit 2</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="entities" style="margin:0;">
+        <div class="section-head"><h2>KNX Entities</h2><span class="count"><span class="live-dot"></span> live · 3</span></div>
+        <div class="card">
+          <div class="card-inner">
+            <table>
+              <thead><tr><th>Entity</th><th>State</th><th>Source</th></tr></thead>
+              <tbody>
+                <tr><td class="mono" style="font-size:12px;">light.plan02_smoke_diele</td><td class="state-on">● on</td><td><span class="pill ok">ui_store</span></td></tr>
+                <tr><td class="mono" style="font-size:12px;">light.plan02_smoke_diele_2</td><td class="state-off">○ off</td><td><span class="pill ok">ui_store</span></td></tr>
+                <tr><td class="mono" style="font-size:12px;">switch.steckdose</td><td class="state-on">● on</td><td><span class="pill warn">yaml</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- HISTORY -->
+    <section class="section history-card" id="history" style="margin-top:32px;">
+      <div class="section-head">
+        <h2>Migration History</h2>
+        <span class="count">12 entries · last 7 days</span>
+        <div class="actions"><button class="btn secondary">Filter</button></div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>#</th><th>Time</th><th>Kind</th><th>Status</th><th>Entries</th></tr></thead>
+          <tbody>
+            <tr><td>3</td><td class="mono" style="font-size:12px;">2026-05-22 12:04:11</td><td class="mono" style="font-size:12px;">convert.commit</td><td><span class="pill ok">ok</span></td><td>1 applied</td></tr>
+            <tr><td>2</td><td class="mono" style="font-size:12px;">2026-05-22 11:58:02</td><td class="mono" style="font-size:12px;">convert.commit</td><td><span class="pill warn">partial</span></td><td>1/2 applied</td></tr>
+            <tr><td>1</td><td class="mono" style="font-size:12px;">2026-05-22 11:42:20</td><td class="mono" style="font-size:12px;">convert.commit</td><td><span class="pill ok">ok</span></td><td>0 entries</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

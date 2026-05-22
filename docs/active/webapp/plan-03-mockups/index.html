@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Plan-03 Mockups — Vergleich</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1a1a24; padding: 32px; }
+  h1 { margin: 0 0 8px; font-size: 26px; font-weight: 700; }
+  .lede { color: #6b6b7b; margin-bottom: 32px; max-width: 720px; line-height: 1.6; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; max-width: 1400px; }
+  .mockup-card { background: #fff; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e4e6ea; transition: all .2s; display: flex; flex-direction: column; }
+  .mockup-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .mockup-card iframe { width: 100%; height: 320px; border: 0; background: #fff; pointer-events: none; }
+  .mockup-card .body { padding: 16px 20px; }
+  .mockup-card h2 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+  .mockup-card .tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+  .mockup-card .desc { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 12px; }
+  .mockup-card .meta { display: flex; gap: 16px; font-size: 11px; color: #888; margin-bottom: 12px; }
+  .mockup-card .meta span { display: flex; gap: 4px; }
+  .mockup-card .actions { display: flex; gap: 8px; padding: 0 20px 16px; }
+  .mockup-card a { padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+  .mockup-card a.open { background: #03a9f4; color: #fff; flex: 1; text-align: center; }
+  .mockup-card a.open:hover { background: #0288d1; }
+  .mockup-card a.pop { background: #f0f0f0; color: #333; }
+  .mockup-card a.pop:hover { background: #e0e0e0; }
+  .tag-light { background: #e3f2fd; color: #0277bd; }
+  .tag-dark { background: #263238; color: #b3e5fc; }
+  .tag-sidebar { background: #ede7f6; color: #5e35b1; }
+  .tag-dash { background: #e0f2fe; color: #0369a1; }
+  .tag-wizard { background: #fff3e0; color: #e65100; }
+  .tag-hybrid { background: linear-gradient(135deg, #ede7f6, #fff3e0); color: #5e35b1; }
+
+  .mockup-card.featured { border: 2px solid #5e35b1; box-shadow: 0 8px 24px rgba(94,53,177,.18); }
+  .mockup-card.featured::before { content: "★ EMPFOHLEN"; position: absolute; top: 12px; right: 12px; background: #5e35b1; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: .8px; z-index: 1; }
+  .mockup-card { position: relative; }
+
+  .pick-box { background: #fffde7; border: 1px solid #f9a825; border-radius: 12px; padding: 20px 24px; margin: 32px 0; max-width: 1400px; }
+  .pick-box h3 { margin: 0 0 8px; color: #f57f17; font-size: 16px; }
+  .pick-box p { margin: 0; color: #5d4037; font-size: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <h1>Plan-03 Frontend-Mockups — finale Wahl</h1>
+  <p class="lede">User-Mockups (HA-Native Light + Dark) sind die finale Design-Richtung. Domain-Tiles als Entry, Stepper inline im Convert-Tab, Tabs: Convert / Entities / History.</p>
+
+  <div class="grid">
+    <div class="mockup-card featured">
+      <iframe src="mockup-1-ha-native.html"></iframe>
+      <div class="body">
+        <span class="tag tag-light">★ User · HA Native (Light)</span>
+        <h2>mockup-1-ha-native.html</h2>
+        <p class="desc">HA-Blau, weiche Pastel-Domain-Tiles (Licht/Sensoren/Rolladen/Heizung), Stepper inline, Roboto + Roboto Mono. Fühlt sich an wie offizielles HA-Addon.</p>
+        <div class="meta"><span>🎨 HA-Blau</span><span>🧱 Domain-First</span><span>📐 inline Stepper</span></div>
+      </div>
+      <div class="actions"><a class="open" href="mockup-1-ha-native.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card featured">
+      <iframe src="mockup-3-dark.html"></iframe>
+      <div class="body">
+        <span class="tag tag-dark">★ User · Dark</span>
+        <h2>mockup-3-dark.html</h2>
+        <p class="desc">HA-Dark-Canvas (#0e1116), sky-blue Akzent mit Glow, Roboto Mono für Status-Pills. Sitzt nahtlos im HA-Dark-iframe. Gleiche Struktur wie Light.</p>
+        <div class="meta"><span>🌙 #0e1116</span><span>✨ glow</span><span>📐 inline Stepper</span></div>
+      </div>
+      <div class="actions"><a class="open" href="mockup-3-dark.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="07-topbar-hybrid.html"></iframe>
+      <div class="body">
+        <span class="tag tag-hybrid">07 · Topbar + Toggle + Wizard-Modal</span>
+        <h2>Verworfen: Wizard im Modal</h2>
+        <p class="desc">Mein Vorschlag mit Modal-Wizard. Verworfen zugunsten inline-Stepper (mockup-1/3).</p>
+      </div>
+      <div class="actions"><a class="open" href="07-topbar-hybrid.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="06-hybrid.html"></iframe>
+      <div class="body">
+        <span class="tag tag-hybrid">06 · Sidebar + Wizard-Modal</span>
+        <h2>Sidebar Hybrid (Vorgänger)</h2>
+        <p class="desc">Linke Nav-Sidebar (dark) + Wizard-Modal. Vorgänger zu 07.</p>
+        <div class="meta"><span>🧰 Shell</span><span>🪄 Wizard</span></div>
+      </div>
+      <div class="actions"><a class="open" href="06-hybrid.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="01-ha-light-tabs.html"></iframe>
+      <div class="body">
+        <span class="tag tag-light">01 · Light · Tabs</span>
+        <h2>HA-Light Tabs</h2>
+        <p class="desc">Klassisches HA-Material-Design. Tabs oben, helle Cards, Roboto-typisch. Sicherste Wahl — fügt sich in HA-Frontend ein.</p>
+        <div class="meta"><span>👍 vertraut</span><span>📐 dicht</span><span>✨ Material</span></div>
+      </div>
+      <div class="actions"><a class="open" href="01-ha-light-tabs.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="02-ha-dark-tabs.html"></iframe>
+      <div class="body">
+        <span class="tag tag-dark">02 · Dark · Tabs</span>
+        <h2>HA-Dark Tabs</h2>
+        <p class="desc">Gleiche Struktur wie 01, aber dark-mode. KNX-techy Look, monospace-Akzente. Gut für Power-User, die viel in der Add-on-UI sind.</p>
+        <div class="meta"><span>🌙 dark</span><span>⚙️ techy</span><span>💎 contrast</span></div>
+      </div>
+      <div class="actions"><a class="open" href="02-ha-dark-tabs.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="03-sidebar-workspace.html"></iframe>
+      <div class="body">
+        <span class="tag tag-sidebar">03 · Sidebar · IDE</span>
+        <h2>Sidebar Workspace</h2>
+        <p class="desc">Eigene Nav-Sidebar links (dunkel), Workspace rechts. IDE-Feel mit Badge-Counts. Skaliert gut auf viele zukünftige Features.</p>
+        <div class="meta"><span>🧰 IDE-ähnlich</span><span>📈 erweiterbar</span><span>🎯 fokussiert</span></div>
+      </div>
+      <div class="actions"><a class="open" href="03-sidebar-workspace.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="04-dashboard.html"></iframe>
+      <div class="body">
+        <span class="tag tag-dash">04 · Dashboard</span>
+        <h2>Single-Page Dashboard</h2>
+        <p class="desc">Alles auf einer Seite, scrollbar. Hero-KPIs oben, dann Sektionen untereinander. Schneller Überblick ohne Klicks.</p>
+        <div class="meta"><span>📊 KPIs</span><span>👀 alles sichtbar</span><span>⚡ schnell</span></div>
+      </div>
+      <div class="actions"><a class="open" href="04-dashboard.html" target="_blank">Öffnen →</a></div>
+    </div>
+
+    <div class="mockup-card">
+      <iframe src="05-wizard.html"></iframe>
+      <div class="body">
+        <span class="tag tag-wizard">05 · Wizard</span>
+        <h2>Wizard Flow</h2>
+        <p class="desc">Schritt-für-Schritt: Datei → Parsen → Dry-Run → Commit mit Stepper-UI. Sehr beginner-freundlich. Entities & History als Nebentabs.</p>
+        <div class="meta"><span>🪄 guided</span><span>👶 einfach</span><span>📋 strukturiert</span></div>
+      </div>
+      <div class="actions"><a class="open" href="05-wizard.html" target="_blank">Öffnen →</a></div>
+    </div>
+  </div>
+
+  <div class="pick-box">
+    <h3>Entschieden: mockup-1-ha-native (Light) + mockup-3-dark (Dark)</h3>
+    <p>User-Mockups gewinnen. Plan-03 baut auf diesem Design: Topbar mit Brand + 3 Tabs (Convert/Entities/History), Domain-Tiles als Convert-Entry, Stepper inline (nicht modal), Roboto + Roboto Mono, lucide-Style SVG-Icons. Light + Dark werden in der Lit-Implementierung via CSS-Variable-Theme-Toggle gemerged (HA-`<ha-theme>` Pattern).</p>
+  </div>
+</body>
+</html>
