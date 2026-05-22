@@ -375,9 +375,10 @@ export class EntitiesView extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // WS itself is owned by knx-app so the topbar pill stays accurate on every
+    // tab; this view only subscribes for incoming events.
     ws.addEventListener("state", this.onWsState);
     ws.addEventListener("status", this.onWsStatusChange);
-    ws.connect();
     void this.refresh();
   }
 
@@ -385,7 +386,6 @@ export class EntitiesView extends LitElement {
     super.disconnectedCallback();
     ws.removeEventListener("state", this.onWsState);
     ws.removeEventListener("status", this.onWsStatusChange);
-    ws.close();
     for (const t of this.flashTimers.values()) clearTimeout(t);
     this.flashTimers.clear();
   }

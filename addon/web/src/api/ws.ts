@@ -13,6 +13,12 @@ export interface StateEvent {
 
 const BACKOFF_STEPS_MS = [1000, 2000, 4000, 8000, 16000, 30000];
 
+// HA Ingress accepts the WS handshake even when the add-on is down, then closes
+// shortly after. Without a grace window the UI would flap open↔closed every
+// backoff cycle. We hold status at "connecting" until the socket stays open for
+// OPEN_GRACE_MS without closing, OR until the first payload arrives.
+const OPEN_GRACE_MS = 600;
+
 function resolveWsUrl(path: string): string {
   const httpUrl = new URL(path, document.baseURI);
   const proto = httpUrl.protocol === "https:" ? "wss:" : "ws:";
@@ -23,6 +29,7 @@ export class WsClient extends EventTarget {
   private _status: LiveStatus = "closed";
   private _socket: WebSocket | null = null;
   private _reconnectTimer: number | null = null;
+  private _openGraceTimer: number | null = null;
   private _backoffIndex = 0;
   private _wantOpen = false;
 
@@ -42,6 +49,7 @@ export class WsClient extends EventTarget {
 
   close(): void {
     this._wantOpen = false;
+    this._clearGraceTimer();
     if (this._reconnectTimer !== null) {
       clearTimeout(this._reconnectTimer);
       this._reconnectTimer = null;
@@ -51,6 +59,13 @@ export class WsClient extends EventTarget {
       this._socket = null;
     }
     this._setStatus("closed");
+  }
+
+  private _clearGraceTimer(): void {
+    if (this._openGraceTimer !== null) {
+      clearTimeout(this._openGraceTimer);
+      this._openGraceTimer = null;
+    }
   }
 
   private _open(): void {
@@ -65,11 +80,26 @@ export class WsClient extends EventTarget {
     this._socket = sock;
 
     sock.addEventListener("open", () => {
-      this._backoffIndex = 0;
-      this._setStatus("open");
+      // Hold "connecting" until either OPEN_GRACE_MS elapses without close
+      // or the first message arrives — protects against HA Ingress accepting
+      // the handshake while the add-on backend is actually down.
+      this._clearGraceTimer();
+      this._openGraceTimer = window.setTimeout(() => {
+        this._openGraceTimer = null;
+        if (this._socket === sock && sock.readyState === WebSocket.OPEN) {
+          this._backoffIndex = 0;
+          this._setStatus("open");
+        }
+      }, OPEN_GRACE_MS);
     });
 
     sock.addEventListener("message", (e) => {
+      // First payload proves the backend is alive — flip to open immediately.
+      if (this._status !== "open") {
+        this._clearGraceTimer();
+        this._backoffIndex = 0;
+        this._setStatus("open");
+      }
       let payload: StateEvent;
       try {
         payload = JSON.parse(e.data as string) as StateEvent;
@@ -80,6 +110,7 @@ export class WsClient extends EventTarget {
     });
 
     const onClosedOrErrored = () => {
+      this._clearGraceTimer();
       this._socket = null;
       if (this._wantOpen) this._scheduleReconnect();
       else this._setStatus("closed");
