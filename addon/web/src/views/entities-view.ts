@@ -2,10 +2,8 @@ import { LitElement, html, css, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "../components/ui/card.js";
 import "../components/ui/btn.js";
-import "../components/ui/pill.js";
 import "../components/ui/icon.js";
 import type { IconName } from "../components/ui/icon.js";
-import "../components/ui/modal.js";
 import { api, ApiClientError } from "../api/client.js";
 import { ws } from "../api/ws.js";
 import type { StateEvent } from "../api/ws.js";
@@ -18,6 +16,42 @@ interface LiveSnapshot {
   lastChanged: string | null;
 }
 
+interface GroupSpec {
+  id: string;
+  label: string;
+  icon: IconName;
+  prefixes: string[];
+  color: "light" | "sensor" | "cover" | "climate" | "neutral";
+}
+
+const GROUPS: GroupSpec[] = [
+  { id: "light", label: "Licht", icon: "lightbulb", prefixes: ["light"], color: "light" },
+  { id: "switch", label: "Schalter", icon: "power", prefixes: ["switch"], color: "light" },
+  {
+    id: "sensor",
+    label: "Sensoren",
+    icon: "activity",
+    prefixes: ["sensor", "binary_sensor"],
+    color: "sensor",
+  },
+  { id: "cover", label: "Rolladen", icon: "layout", prefixes: ["cover"], color: "cover" },
+  {
+    id: "climate",
+    label: "Heizung",
+    icon: "thermometer",
+    prefixes: ["climate"],
+    color: "climate",
+  },
+  {
+    id: "time",
+    label: "Zeit",
+    icon: "clock",
+    prefixes: ["time", "datetime"],
+    color: "neutral",
+  },
+  { id: "other", label: "Sonstige", icon: "file", prefixes: [], color: "neutral" },
+];
+
 const STATE_LABELS: Record<string, string> = {
   on: "an",
   off: "aus",
@@ -25,7 +59,6 @@ const STATE_LABELS: Record<string, string> = {
   unavailable: "nicht verfügbar",
   idle: "inaktiv",
   active: "aktiv",
-  // climate
   heat: "heizen",
   cool: "kühlen",
   heat_cool: "heizen/kühlen",
@@ -34,25 +67,33 @@ const STATE_LABELS: Record<string, string> = {
   dry: "entfeuchten",
   heating: "heizt",
   cooling: "kühlt",
-  // cover
   open: "offen",
   closed: "geschlossen",
   opening: "öffnet",
   closing: "schließt",
-  // presence / binary
   home: "zuhause",
   not_home: "abwesend",
   detected: "erkannt",
   not_detected: "nicht erkannt",
   locked: "gesperrt",
   unlocked: "entsperrt",
-  // generic
   none: "—",
 };
 
 function translateState(value: string | null): string {
   if (value === null) return "—";
   return STATE_LABELS[value.toLowerCase()] ?? value;
+}
+
+function entityPrefix(entityId: string): string {
+  return entityId.split(".", 1)[0] ?? "";
+}
+
+function groupForPrefix(prefix: string): GroupSpec {
+  for (const g of GROUPS) {
+    if (g.prefixes.includes(prefix)) return g;
+  }
+  return GROUPS[GROUPS.length - 1]!; // "other"
 }
 
 @customElement("entities-view")
@@ -68,121 +109,133 @@ export class EntitiesView extends LitElement {
     }
     p.lede {
       color: var(--text-secondary);
-      margin: 0 0 24px;
+      margin: 0 0 20px;
     }
-    .card-head {
+    .top-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 14px;
+      margin-bottom: 18px;
     }
-    .card-head h2 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 500;
-    }
-    .card-head .count {
-      margin-left: auto;
+    .top-row .status {
       font-size: 13px;
       color: var(--text-secondary);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .top-row .right {
+      margin-left: auto;
     }
-    th {
-      text-align: left;
-      padding: 0 14px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid var(--border);
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
-    td {
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      vertical-align: middle;
+    @media (max-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
-    tbody tr:last-child td {
-      border-bottom: 0;
+    .group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    tbody tr:hover {
-      background: var(--surface-2);
-    }
-    .mono {
-      font-family: var(--mono);
-      font-size: 13px;
-    }
-    .check-col {
-      width: 38px;
-    }
-    .id-cell {
+    .group-head {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      background: none;
+      border: 0;
+      width: 100%;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      transition: background 0.15s;
     }
-    .id-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
+    .group-head:hover {
+      background: var(--surface-2);
+    }
+    .group-head .icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       display: grid;
       place-items: center;
+      font-size: 20px;
       flex-shrink: 0;
-      font-size: 15px;
     }
-    .id-icon.light {
+    .group-head .icon.light {
       background: var(--d-light-bg);
       color: var(--d-light);
     }
-    .id-icon.sensor {
+    .group-head .icon.sensor {
       background: var(--d-sensor-bg);
       color: var(--d-sensor);
     }
-    .id-icon.cover {
+    .group-head .icon.cover {
       background: var(--d-cover-bg);
       color: var(--d-cover);
     }
-    .id-icon.climate {
+    .group-head .icon.climate {
       background: var(--d-climate-bg);
       color: var(--d-climate);
     }
-    .id-icon.neutral {
+    .group-head .icon.neutral {
       background: var(--surface-2);
       color: var(--text-secondary);
     }
-    .state {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 11px;
-      border-radius: 999px;
-      font-size: 13px;
+    .group-head .label {
+      font-size: 16px;
       font-weight: 500;
-      background: var(--surface-2);
-      color: var(--text-secondary);
+    }
+    .group-head .count {
+      margin-left: auto;
       font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
     }
-    .state.on {
-      background: var(--ok-bg);
-      color: var(--ok);
+    .group-head .chev {
+      color: var(--text-tertiary);
+      font-size: 18px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .state.warn {
-      background: var(--warn-bg);
-      color: var(--warn);
+    .group.open .group-head .chev {
+      transform: rotate(90deg);
     }
-    .state .unit {
-      opacity: 0.75;
-      margin-left: 3px;
+    .group-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .state.unknown {
-      opacity: 0.7;
+    .group.open .group-body {
+      grid-template-rows: 1fr;
     }
-    tr.updated td {
-      animation: flash 1.2s ease-out;
+    .group-body > .inner {
+      overflow: hidden;
+      min-height: 0;
     }
-    @keyframes flash {
+    .row {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1.6fr) minmax(0, 1fr) auto 96px;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+    .row:hover {
+      background: var(--surface-2);
+    }
+    .row.updated {
+      animation: rowflash 1.2s ease-out;
+    }
+    @keyframes rowflash {
       0% {
         background: var(--accent-soft);
       }
@@ -190,16 +243,83 @@ export class EntitiesView extends LitElement {
         background: transparent;
       }
     }
-    .card-foot {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-top: 18px;
-      margin-top: 18px;
-      border-top: 1px solid var(--border);
+    .row .r-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      flex-shrink: 0;
     }
-    .card-foot .del {
-      margin-left: auto;
+    .row .r-icon.light {
+      background: var(--d-light-bg);
+      color: var(--d-light);
+    }
+    .row .r-icon.sensor {
+      background: var(--d-sensor-bg);
+      color: var(--d-sensor);
+    }
+    .row .r-icon.cover {
+      background: var(--d-cover-bg);
+      color: var(--d-cover);
+    }
+    .row .r-icon.climate {
+      background: var(--d-climate-bg);
+      color: var(--d-climate);
+    }
+    .row .r-icon.neutral {
+      background: var(--surface-2);
+      color: var(--text-secondary);
+    }
+    .eid {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stateval {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .stateval.on {
+      color: var(--ok);
+      font-weight: 500;
+    }
+    .stateval.warn {
+      color: var(--warn);
+      font-weight: 500;
+    }
+    .stateval.dim {
+      color: var(--text-tertiary);
+    }
+    .stateval .unit {
+      opacity: 0.7;
+      margin-left: 3px;
+    }
+    .source {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.3px;
+      text-transform: lowercase;
+    }
+    .lastup {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-align: right;
+    }
+    .empty-group {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-tertiary);
+      font-style: italic;
+      font-size: 13px;
     }
     .loading,
     .error,
@@ -211,35 +331,14 @@ export class EntitiesView extends LitElement {
     .error {
       color: var(--err);
     }
-    .modal-list {
-      list-style: none;
-      padding: 10px 14px;
-      margin: 6px 0;
-      background: var(--surface-2);
-      border-radius: 8px;
-      max-height: 180px;
-      overflow: auto;
-    }
-    .modal-list li {
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 3px 0;
-      color: var(--text-secondary);
-    }
-    .modal-warn {
-      color: var(--err);
-      font-size: 13px;
-    }
   `;
 
   @state() private entities: EntitySummary[] = [];
   @state() private liveStates = new Map<string, LiveSnapshot>();
   @state() private recentlyUpdated = new Set<string>();
-  @state() private selected = new Set<string>();
+  @state() private openGroups = new Set<string>();
   @state() private loading = false;
   @state() private error: string | null = null;
-  @state() private deleting = false;
-  @state() private deleteModalOpen = false;
   @state() private wsStatus: LiveStatus = ws.status;
 
   private flashTimers = new Map<string, number>();
@@ -296,10 +395,6 @@ export class EntitiesView extends LitElement {
     try {
       const res = await api.entities.list();
       this.entities = res.entities;
-      const stillValid = new Set(res.entities.map((e) => e.entity_id));
-      const trimmedSel = new Set<string>();
-      for (const id of this.selected) if (stillValid.has(id)) trimmedSel.add(id);
-      this.selected = trimmedSel;
     } catch (err) {
       this.error = err instanceof ApiClientError ? err.message : String(err);
     } finally {
@@ -307,47 +402,11 @@ export class EntitiesView extends LitElement {
     }
   }
 
-  private toggleSelect(id: string, checked: boolean): void {
-    const next = new Set(this.selected);
-    if (checked) next.add(id);
-    else next.delete(id);
-    this.selected = next;
-  }
-
-  private toggleSelectAll(checked: boolean): void {
-    if (checked) this.selected = new Set(this.entities.map((e) => e.entity_id));
-    else this.selected = new Set();
-  }
-
-  private openDeleteModal(): void {
-    if (this.selected.size === 0) return;
-    this.deleteModalOpen = true;
-  }
-
-  private closeDeleteModal(): void {
-    if (this.deleting) return;
-    this.deleteModalOpen = false;
-  }
-
-  private async confirmDelete(): Promise<void> {
-    if (this.deleting) return;
-    this.deleting = true;
-    this.error = null;
-    const ids = [...this.selected];
-    const errors: string[] = [];
-    for (const id of ids) {
-      try {
-        await api.entities.delete(id);
-      } catch (err) {
-        errors.push(
-          `${id}: ${err instanceof ApiClientError ? err.message : String(err)}`,
-        );
-      }
-    }
-    this.deleting = false;
-    this.deleteModalOpen = false;
-    if (errors.length > 0) this.error = errors.join(" · ");
-    await this.refresh();
+  private toggleGroup(id: string): void {
+    const next = new Set(this.openGroups);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    this.openGroups = next;
   }
 
   private formatTime(iso: string | null): string {
@@ -357,11 +416,11 @@ export class EntitiesView extends LitElement {
     return d.toLocaleTimeString([], { hour12: false });
   }
 
-  private stateClass(value: string | null): string {
-    if (!value) return "state unknown";
+  private stateValClass(value: string | null): string {
+    if (!value) return "stateval dim";
     const v = value.toLowerCase();
     if (v === "on" || v === "open" || v === "home" || v === "detected" || v === "unlocked")
-      return "state on";
+      return "stateval on";
     if (
       v === "heat" ||
       v === "cool" ||
@@ -370,32 +429,9 @@ export class EntitiesView extends LitElement {
       v === "opening" ||
       v === "closing"
     )
-      return "state warn";
-    if (v === "unknown" || v === "unavailable") return "state unknown";
-    return "state";
-  }
-
-  private iconForEntity(entityId: string): { icon: IconName; kind: string } {
-    const prefix = entityId.split(".", 1)[0] ?? "";
-    switch (prefix) {
-      case "light":
-        return { icon: "lightbulb", kind: "light" };
-      case "switch":
-        return { icon: "power", kind: "light" };
-      case "sensor":
-        return { icon: "activity", kind: "sensor" };
-      case "binary_sensor":
-        return { icon: "alert-circle", kind: "sensor" };
-      case "cover":
-        return { icon: "layout", kind: "cover" };
-      case "climate":
-        return { icon: "thermometer", kind: "climate" };
-      case "time":
-      case "datetime":
-        return { icon: "clock", kind: "neutral" };
-      default:
-        return { icon: "file", kind: "neutral" };
-    }
+      return "stateval warn";
+    if (v === "unknown" || v === "unavailable") return "stateval dim";
+    return "stateval";
   }
 
   private renderStateValue(value: string | null, unit: string | null) {
@@ -406,142 +442,110 @@ export class EntitiesView extends LitElement {
     return html`${display}`;
   }
 
+  private iconForEntity(entityId: string): { icon: IconName; kind: string } {
+    const prefix = entityPrefix(entityId);
+    const group = groupForPrefix(prefix);
+    // Binary sensor gets a distinct glyph from analog sensor.
+    if (prefix === "binary_sensor") return { icon: "alert-circle", kind: group.color };
+    if (prefix === "switch") return { icon: "power", kind: group.color };
+    return { icon: group.icon, kind: group.color };
+  }
+
+  private groupedEntities(): Map<string, EntitySummary[]> {
+    const buckets = new Map<string, EntitySummary[]>();
+    for (const g of GROUPS) buckets.set(g.id, []);
+    for (const e of this.entities) {
+      const grp = groupForPrefix(entityPrefix(e.entity_id));
+      buckets.get(grp.id)!.push(e);
+    }
+    for (const list of buckets.values()) {
+      list.sort((a, b) => a.entity_id.localeCompare(b.entity_id));
+    }
+    return buckets;
+  }
+
+  private statusLine(total: number) {
+    if (this.wsStatus === "open") return html`Live · ${total} Entitäten`;
+    if (this.wsStatus === "connecting") return html`Verbinde…`;
+    return html`Offline · ${total} Entitäten`;
+  }
+
   override render() {
     const total = this.entities.length;
-    const selectedCount = this.selected.size;
-    const allSelected = total > 0 && selectedCount === total;
+    const grouped = this.groupedEntities();
     return html`
       <h1>KNX-Entitäten</h1>
-      <p class="lede">Liste aller KNX-Entitäten mit Live-Status über WebSocket.</p>
-      <knx-card>
-        <div class="card-head">
-          <h2>KNX-Entitäten</h2>
-          <span class="count">
-            ${this.wsStatus === "open"
-              ? html`Live · ${total} Entitäten`
-              : this.wsStatus === "connecting"
-                ? html`Verbinde…`
-                : html`Offline · ${total} Entitäten`}
-          </span>
-        </div>
-        ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
-        ${this.loading
-          ? html`<div class="loading">Lade Entitäten…</div>`
-          : total === 0
-            ? html`<div class="empty">
-                Keine KNX-Entitäten gefunden. Lege welche im Konvertieren-Tab an.
-              </div>`
-            : html`
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="check-col">
-                        <input
-                          type="checkbox"
-                          .checked=${allSelected}
-                          @change=${(e: Event) =>
-                            this.toggleSelectAll(
-                              (e.target as HTMLInputElement).checked,
-                            )}
-                        />
-                      </th>
-                      <th>Entitäts-ID</th>
-                      <th>Status</th>
-                      <th>Quelle</th>
-                      <th>Letzte Aktualisierung</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${this.entities.map((e) => {
-                      const live = this.liveStates.get(e.entity_id);
-                      const stateValue = live?.state ?? e.state ?? null;
-                      const unit = live?.unit ?? e.unit_of_measurement ?? null;
-                      const lastChanged =
-                        live?.lastChanged ?? e.last_changed ?? null;
-                      const rowClass = this.recentlyUpdated.has(e.entity_id)
-                        ? "updated"
-                        : "";
-                      return html`
-                        <tr class=${rowClass}>
-                          <td>
-                            <input
-                              type="checkbox"
-                              .checked=${this.selected.has(e.entity_id)}
-                              @change=${(ev: Event) =>
-                                this.toggleSelect(
-                                  e.entity_id,
-                                  (ev.target as HTMLInputElement).checked,
-                                )}
-                            />
-                          </td>
-                          <td>
-                            <div class="id-cell">
-                              ${(() => {
-                                const ic = this.iconForEntity(e.entity_id);
-                                return html`<span class="id-icon ${ic.kind}"
-                                  ><knx-icon .name=${ic.icon}></knx-icon
-                                ></span>`;
-                              })()}
-                              <span class="mono">${e.entity_id}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <span class=${this.stateClass(stateValue)}>
-                              ${this.renderStateValue(stateValue, unit)}
-                            </span>
-                          </td>
-                          <td>
-                            <knx-pill kind="ok" .showDot=${false}>
-                              ${e.platform || "knx"}
-                            </knx-pill>
-                          </td>
-                          <td class="mono">${this.formatTime(lastChanged)}</td>
-                        </tr>
-                      `;
-                    })}
-                  </tbody>
-                </table>
-              `}
-        <div class="card-foot">
+      <p class="lede">
+        Nach Bereich gruppiert. Klick auf Gruppe öffnet Liste mit Live-Status.
+        Löschen erfolgt direkt in der KNX-Integration.
+      </p>
+      <div class="top-row">
+        <span class="status">${this.statusLine(total)}</span>
+        <div class="right">
           <knx-btn variant="ghost" @click=${this.refresh} ?disabled=${this.loading}>
             <knx-icon name="refresh"></knx-icon>Aktualisieren
           </knx-btn>
-          <knx-btn
-            class="del"
-            variant="danger"
-            ?disabled=${selectedCount === 0 || this.deleting}
-            @click=${this.openDeleteModal}
-          >
-            <knx-icon name="trash"></knx-icon>
-            ${selectedCount === 0
-              ? "Markierte löschen"
-              : `${selectedCount} löschen`}
-          </knx-btn>
         </div>
-      </knx-card>
+      </div>
+      ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
+      ${this.loading && total === 0
+        ? html`<div class="loading">Lade Entitäten…</div>`
+        : total === 0
+          ? html`<div class="empty">
+              Keine KNX-Entitäten gefunden. Lege welche im Konvertieren-Tab an.
+            </div>`
+          : html`
+              <div class="grid">
+                ${GROUPS.filter((g) => (grouped.get(g.id)?.length ?? 0) > 0).map(
+                  (g) => this.renderGroup(g, grouped.get(g.id) ?? []),
+                )}
+              </div>
+            `}
+    `;
+  }
 
-      <knx-modal
-        ?open=${this.deleteModalOpen}
-        kind="danger"
-        .heading=${this.selected.size === 1
-          ? "Entität löschen?"
-          : `${this.selected.size} Entitäten löschen?`}
-        confirmLabel=${this.selected.size === 1 ? "Löschen" : "Alle löschen"}
-        cancelLabel="Abbrechen"
-        ?busy=${this.deleting}
-        @cancel=${this.closeDeleteModal}
-        @confirm=${this.confirmDelete}
-      >
-        <p>
-          Folgende
-          ${this.selected.size === 1 ? "Entität wird" : "Entitäten werden"}
-          aus der KNX-Integration entfernt:
-        </p>
-        <ul class="modal-list">
-          ${[...this.selected].map((id) => html`<li>${id}</li>`)}
-        </ul>
-        <p class="modal-warn">Diese Aktion kann nicht rückgängig gemacht werden.</p>
-      </knx-modal>
+  private renderGroup(group: GroupSpec, items: EntitySummary[]) {
+    const open = this.openGroups.has(group.id);
+    return html`
+      <div class="group ${open ? "open" : ""}">
+        <button class="group-head" @click=${() => this.toggleGroup(group.id)}>
+          <span class="icon ${group.color}">
+            <knx-icon .name=${group.icon}></knx-icon>
+          </span>
+          <span class="label">${group.label}</span>
+          <span class="count">${items.length}</span>
+          <span class="chev"><knx-icon name="chevron-right"></knx-icon></span>
+        </button>
+        <div class="group-body">
+          <div class="inner">
+            ${items.length === 0
+              ? html`<div class="empty-group">Keine Entitäten in dieser Gruppe.</div>`
+              : items.map((e) => this.renderRow(e))}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderRow(e: EntitySummary) {
+    const live = this.liveStates.get(e.entity_id);
+    const stateValue = live?.state ?? e.state ?? null;
+    const unit = live?.unit ?? e.unit_of_measurement ?? null;
+    const lastChanged = live?.lastChanged ?? e.last_changed ?? null;
+    const flash = this.recentlyUpdated.has(e.entity_id) ? "updated" : "";
+    const ic = this.iconForEntity(e.entity_id);
+    return html`
+      <div class="row ${flash}">
+        <span class="r-icon ${ic.kind}">
+          <knx-icon .name=${ic.icon}></knx-icon>
+        </span>
+        <span class="eid" title=${e.entity_id}>${e.entity_id}</span>
+        <span class=${this.stateValClass(stateValue)}>
+          ${this.renderStateValue(stateValue, unit)}
+        </span>
+        <span class="source">${e.platform || "knx"}</span>
+        <span class="lastup">${this.formatTime(lastChanged)}</span>
+      </div>
     `;
   }
 }
