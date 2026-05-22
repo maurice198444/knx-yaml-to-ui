@@ -6,6 +6,8 @@ import "../views/entities-view.js";
 import "../views/history-view.js";
 import { currentRoute, onRouteChange } from "../router.js";
 import type { Route } from "../router.js";
+import { ws } from "../api/ws.js";
+import type { LiveStatus } from "./ui/live-dot.js";
 
 @customElement("knx-app")
 export class KnxApp extends LitElement {
@@ -25,23 +27,31 @@ export class KnxApp extends LitElement {
   `;
 
   @state() private route: Route = currentRoute();
-  private unsub?: () => void;
+  @state() private wsStatus: LiveStatus = ws.status;
+  private unsubRoute?: () => void;
+  private unsubWs?: () => void;
 
   override connectedCallback() {
     super.connectedCallback();
-    this.unsub = onRouteChange((r) => {
+    this.unsubRoute = onRouteChange((r) => {
       this.route = r;
     });
+    const onWsStatus = () => {
+      this.wsStatus = ws.status;
+    };
+    ws.addEventListener("status", onWsStatus);
+    this.unsubWs = () => ws.removeEventListener("status", onWsStatus);
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.unsub?.();
+    this.unsubRoute?.();
+    this.unsubWs?.();
   }
 
   override render() {
     return html`
-      <knx-topbar .route=${this.route}></knx-topbar>
+      <knx-topbar .route=${this.route} .wsStatus=${this.wsStatus}></knx-topbar>
       <main>${this.renderView()}</main>
     `;
   }

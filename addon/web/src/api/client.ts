@@ -110,5 +110,9 @@ export const api = {
     list: () => request<EntitiesResponse>("api/entities"),
     get: (entityId: string) =>
       request<EntityConfigResponse>(`api/entities/${encodeURIComponent(entityId)}`),
+    delete: (entityId: string) =>
+      request<null>(`api/entities/${encodeURIComponent(entityId)}`, {
+        method: "DELETE",
+      }),
   },
 };
