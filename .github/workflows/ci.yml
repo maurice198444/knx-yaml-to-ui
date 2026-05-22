@@ -85,6 +85,39 @@ jobs:
             --cov-fail-under=70 \
             -v
 
+  frontend:
+    name: addon/web (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: addon/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: addon/web/pnpm-lock.yaml
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Lint (eslint)
+        run: pnpm lint
+      - name: Type check (tsc)
+        run: pnpm typecheck
+      - name: Build (vite)
+        run: pnpm build
+      - name: Check bundle size budget
+        run: |
+          total=$(find dist/assets -name '*.js' -exec gzip -c {} \; | wc -c)
+          echo "Total JS gzipped: $total bytes"
+          if [ "$total" -gt 204800 ]; then
+            echo "Bundle exceeds 200 KB gzipped budget"
+            exit 1
+          fi
+
   addon-docker:
     name: addon/Dockerfile build (amd64)
     runs-on: ubuntu-latest
