@@ -18,6 +18,43 @@ interface LiveSnapshot {
   lastChanged: string | null;
 }
 
+const STATE_LABELS: Record<string, string> = {
+  on: "an",
+  off: "aus",
+  unknown: "unbekannt",
+  unavailable: "nicht verfügbar",
+  idle: "inaktiv",
+  active: "aktiv",
+  // climate
+  heat: "heizen",
+  cool: "kühlen",
+  heat_cool: "heizen/kühlen",
+  auto: "automatisch",
+  fan_only: "nur lüfter",
+  dry: "entfeuchten",
+  heating: "heizt",
+  cooling: "kühlt",
+  // cover
+  open: "offen",
+  closed: "geschlossen",
+  opening: "öffnet",
+  closing: "schließt",
+  // presence / binary
+  home: "zuhause",
+  not_home: "abwesend",
+  detected: "erkannt",
+  not_detected: "nicht erkannt",
+  locked: "gesperrt",
+  unlocked: "entsperrt",
+  // generic
+  none: "—",
+};
+
+function translateState(value: string | null): string {
+  if (value === null) return "—";
+  return STATE_LABELS[value.toLowerCase()] ?? value;
+}
+
 @customElement("entities-view")
 export class EntitiesView extends LitElement {
   static override styles = css`
@@ -119,7 +156,6 @@ export class EntitiesView extends LitElement {
     .state {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
       padding: 4px 11px;
       border-radius: 999px;
       font-size: 13px;
@@ -128,22 +164,17 @@ export class EntitiesView extends LitElement {
       color: var(--text-secondary);
       font-family: var(--mono);
     }
-    .state .sdot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--text-tertiary);
-    }
     .state.on {
       background: var(--ok-bg);
       color: var(--ok);
     }
-    .state.on .sdot {
-      background: var(--ok);
+    .state.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
     }
     .state .unit {
       opacity: 0.75;
-      margin-left: 1px;
+      margin-left: 3px;
     }
     .state.unknown {
       opacity: 0.7;
@@ -329,7 +360,18 @@ export class EntitiesView extends LitElement {
   private stateClass(value: string | null): string {
     if (!value) return "state unknown";
     const v = value.toLowerCase();
-    if (v === "on") return "state on";
+    if (v === "on" || v === "open" || v === "home" || v === "detected" || v === "unlocked")
+      return "state on";
+    if (
+      v === "heat" ||
+      v === "cool" ||
+      v === "heating" ||
+      v === "cooling" ||
+      v === "opening" ||
+      v === "closing"
+    )
+      return "state warn";
+    if (v === "unknown" || v === "unavailable") return "state unknown";
     return "state";
   }
 
@@ -358,8 +400,10 @@ export class EntitiesView extends LitElement {
 
   private renderStateValue(value: string | null, unit: string | null) {
     if (value === null) return html`—`;
-    if (unit) return html`${value}<span class="unit"> ${unit}</span>`;
-    return html`${value}`;
+    const isNumeric = unit !== null && !Number.isNaN(Number(value));
+    const display = isNumeric ? value : translateState(value);
+    if (unit) return html`${display}<span class="unit">${unit}</span>`;
+    return html`${display}`;
   }
 
   override render() {
@@ -443,12 +487,13 @@ export class EntitiesView extends LitElement {
                           </td>
                           <td>
                             <span class=${this.stateClass(stateValue)}>
-                              <span class="sdot"></span
-                              >${this.renderStateValue(stateValue, unit)}
+                              ${this.renderStateValue(stateValue, unit)}
                             </span>
                           </td>
                           <td>
-                            <knx-pill kind="ok">${e.platform || "knx"}</knx-pill>
+                            <knx-pill kind="ok" .showDot=${false}>
+                              ${e.platform || "knx"}
+                            </knx-pill>
                           </td>
                           <td class="mono">${this.formatTime(lastChanged)}</td>
                         </tr>
