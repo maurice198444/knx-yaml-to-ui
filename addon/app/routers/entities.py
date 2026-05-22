@@ -17,18 +17,30 @@ HaDep = Annotated[HAClient, Depends(get_ha_client)]
 
 @router.get("", response_model=EntitiesResponse)
 async def list_entities(ha: HaDep) -> EntitiesResponse:
-    result = await ha.send({"type": "config/entity_registry/list"})
-    raw_entries = result if isinstance(result, list) else result.get("entities", [])
-    entries = [
-        EntitySummary(
-            entity_id=e["entity_id"],
-            name=e.get("name"),
-            platform=e.get("platform", ""),
-            state=None,
+    registry = await ha.send({"type": "config/entity_registry/list"})
+    raw_entries = registry if isinstance(registry, list) else registry.get("entities", [])
+    knx_entries = [e for e in raw_entries if e.get("platform") == "knx"]
+
+    # Enrich with current state + unit + last_changed (one extra WS call).
+    states_result = await ha.send({"type": "get_states"})
+    raw_states = states_result if isinstance(states_result, list) else []
+    state_by_id = {s["entity_id"]: s for s in raw_states if "entity_id" in s}
+
+    entries = []
+    for e in knx_entries:
+        eid = e["entity_id"]
+        st = state_by_id.get(eid, {})
+        attrs = st.get("attributes") or {}
+        entries.append(
+            EntitySummary(
+                entity_id=eid,
+                name=e.get("name") or attrs.get("friendly_name"),
+                platform=e.get("platform", ""),
+                state=st.get("state"),
+                unit_of_measurement=attrs.get("unit_of_measurement"),
+                last_changed=st.get("last_changed"),
+            )
         )
-        for e in raw_entries
-        if e.get("platform") == "knx"
-    ]
     return EntitiesResponse(entities=entries)
 
 

@@ -27,10 +27,10 @@ export class HistoryView extends LitElement {
 
   override render() {
     return html`
-      <h1>Migration History</h1>
-      <p class="lede">Letzte convert.commit-Operationen dieser Session.</p>
+      <h1>Migrationsverlauf</h1>
+      <p class="lede">Letzte Konvertier-Vorgänge dieser Sitzung.</p>
       <knx-card>
-        <div class="placeholder">History-Liste — wird in P4 implementiert.</div>
+        <div class="placeholder">Verlauf-Liste — wird in P4 implementiert.</div>
       </knx-card>
     `;
   }

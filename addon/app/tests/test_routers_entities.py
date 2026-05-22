@@ -29,6 +29,23 @@ async def client(
         {"entity_id": "switch.steckdose", "platform": "knx", "name": "Steckdose"},
         {"entity_id": "light.fremd", "platform": "hue", "name": "Hue"},
     ]
+    fake_ha_client.results["get_states"] = [
+        {
+            "entity_id": "light.diele",
+            "state": "on",
+            "attributes": {"friendly_name": "Diele", "brightness": 200},
+            "last_changed": "2026-05-22T08:00:00+00:00",
+        },
+        {
+            "entity_id": "sensor.aussentemp",
+            "state": "23.5",
+            "attributes": {
+                "friendly_name": "Aussen",
+                "unit_of_measurement": "°C",
+            },
+            "last_changed": "2026-05-22T08:05:00+00:00",
+        },
+    ]
     fake_ha_client.results["knx/get_entity_config"] = {
         "platform": "light",
         "data": {"entity": {"name": "Diele"}, "knx": {"ga_switch": {"write": "1/0/15"}}},
@@ -45,6 +62,21 @@ async def test_list_entities_filters_to_knx_platform(client: AsyncClient) -> Non
     body = resp.json()
     ids = sorted(e["entity_id"] for e in body["entities"])
     assert ids == ["light.diele", "switch.steckdose"]
+
+
+@pytest.mark.asyncio
+async def test_list_entities_enriches_with_state_and_unit(client: AsyncClient) -> None:
+    resp = await client.get("/api/entities")
+    assert resp.status_code == 200
+    by_id = {e["entity_id"]: e for e in resp.json()["entities"]}
+    diele = by_id["light.diele"]
+    assert diele["state"] == "on"
+    assert diele["last_changed"] == "2026-05-22T08:00:00+00:00"
+    assert diele["unit_of_measurement"] is None
+    # Steckdose has no get_states entry — should still surface, with state None.
+    steckdose = by_id["switch.steckdose"]
+    assert steckdose["state"] is None
+    assert steckdose["unit_of_measurement"] is None
 
 
 @pytest.mark.asyncio

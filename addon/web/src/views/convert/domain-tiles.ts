@@ -149,7 +149,7 @@ export class DomainTiles extends LitElement {
 
   override render() {
     return html`
-      <div class="label">KNX Domains</div>
+      <div class="label">KNX-Bereiche</div>
       <div class="grid">
         ${TILES.map(
           (t) => html`
@@ -165,7 +165,7 @@ export class DomainTiles extends LitElement {
               <div>
                 <div class="title">${t.label}</div>
                 <div class="status">
-                  ${t.enabled ? "verfügbar" : "coming soon"}
+                  ${t.enabled ? "verfügbar" : "demnächst"}
                 </div>
               </div>
               <div class="count">${this.counts[t.id] ?? 0}</div>

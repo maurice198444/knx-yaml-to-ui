@@ -75,6 +75,8 @@ export interface EntitySummary {
   name: string | null;
   platform: string;
   state: string | null;
+  unit_of_measurement?: string | null;
+  last_changed?: string | null;
 }
 
 export interface EntitiesResponse {

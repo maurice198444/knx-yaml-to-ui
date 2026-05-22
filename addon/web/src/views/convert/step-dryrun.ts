@@ -196,18 +196,18 @@ export class StepDryRun extends LitElement {
     const domain = store.state.selectedDomain;
     const entries = this.result?.entries ?? [];
     return html`
-      <h2>Dry-Run-Ergebnis prüfen</h2>
+      <h2>Testlauf-Ergebnis prüfen</h2>
       <p class="meta">
-        Datei <code>${path}</code> · Domain <code>${domain}</code> ·
-        ${entries.length} Entities erkannt
+        Datei <code>${path}</code> · Bereich <code>${domain}</code> ·
+        ${entries.length} Entitäten erkannt
       </p>
       ${this.loading
-        ? html`<div class="loading">Dry-Run läuft…</div>`
+        ? html`<div class="loading">Testlauf läuft…</div>`
         : this.error
           ? html`<div class="error">${this.error}</div>`
           : entries.length === 0
             ? html`<div class="loading">
-                Keine Entities im Dry-Run-Ergebnis.
+                Keine Entitäten im Testlauf-Ergebnis.
               </div>`
             : html`
                 <table>
@@ -236,8 +236,8 @@ export class StepDryRun extends LitElement {
                                     @click=${() => this.togglePayload(e.name)}
                                   >
                                     ${this.expanded.has(e.name)
-                                      ? "Payload verbergen"
-                                      : "Payload anzeigen →"}
+                                      ? "Daten verbergen"
+                                      : "Daten anzeigen →"}
                                   </button>
                                   ${this.expanded.has(e.name)
                                     ? html`<pre class="payload">
@@ -259,11 +259,11 @@ ${JSON.stringify(e.payload, null, 2)}</pre
                       <div class="summary">
                         <div class="num">${this.okCount}</div>
                         <div>
-                          <h3>Bereit zum Commit</h3>
+                          <h3>Bereit zur Übernahme</h3>
                           <p>
-                            ${this.okCount} Entit${this.okCount === 1
-                              ? "y wird"
-                              : "ies werden"}
+                            ${this.okCount} Entität${this.okCount === 1
+                              ? " wird"
+                              : "en werden"}
                             als UI-Config-Store-Eintr${this.okCount === 1
                               ? "ag"
                               : "äge"}
@@ -284,8 +284,8 @@ ${JSON.stringify(e.payload, null, 2)}</pre
             ?disabled=${this.okCount === 0}
             @click=${this.next}
           >
-            ${this.okCount} Entit${this.okCount === 1 ? "y" : "ies"}
-            committen
+            ${this.okCount} Entität${this.okCount === 1 ? "" : "en"}
+            übernehmen
             <knx-icon name="chevron-right"></knx-icon>
           </knx-btn>
         </div>

@@ -8,8 +8,8 @@ const ORDER: ConvertStep[] = ["file", "parse", "dryrun", "commit"];
 const LABELS: Record<ConvertStep, string> = {
   file: "Datei",
   parse: "Parsen",
-  dryrun: "Dry-Run",
-  commit: "Commit",
+  dryrun: "Testlauf",
+  commit: "Übernehmen",
 };
 
 @customElement("convert-stepper")

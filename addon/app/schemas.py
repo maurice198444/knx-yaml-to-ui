@@ -81,6 +81,8 @@ class EntitySummary(BaseModel):
     name: str | None
     platform: str
     state: str | None
+    unit_of_measurement: str | None = None
+    last_changed: str | None = None
 
 
 class EntitiesResponse(BaseModel):

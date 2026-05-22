@@ -167,7 +167,7 @@ export class StepCommit extends LitElement {
       const failed = this.result.entries.filter((e) => !e.applied);
       const allOk = failed.length === 0;
       return html`
-        <h2>${allOk ? "Commit erfolgreich" : "Commit teilweise"}</h2>
+        <h2>${allOk ? "Übernahme erfolgreich" : "Übernahme teilweise"}</h2>
         <p class="meta">
           Migration #${this.result.migration_id} · Datei <code>${path}</code>
         </p>
@@ -175,9 +175,9 @@ export class StepCommit extends LitElement {
           <knx-icon name="check"></knx-icon>
           <div>
             <strong
-              >${applied.length} Entit${applied.length === 1
-                ? "y"
-                : "ies"}
+              >${applied.length} Entität${applied.length === 1
+                ? ""
+                : "en"}
               angelegt</strong
             >${failed.length > 0
               ? html` · ${failed.length} Fehler`
@@ -203,14 +203,14 @@ export class StepCommit extends LitElement {
         </ul>
         <div class="actions">
           <knx-btn variant="ghost" @click=${this.restart}>
-            Neuer Convert-Flow
+            Neuer Konvertier-Vorgang
           </knx-btn>
           <div class="right">
             <knx-btn
               variant="primary"
               @click=${() => (window.location.hash = "entities")}
             >
-              Zu den Entities
+              Zu den Entitäten
               <knx-icon name="chevron-right"></knx-icon>
             </knx-btn>
           </div>
@@ -219,10 +219,10 @@ export class StepCommit extends LitElement {
     }
 
     return html`
-      <h2>Commit bestätigen</h2>
+      <h2>Übernahme bestätigen</h2>
       <p class="meta">
-        Datei <code>${path}</code> · Domain <code>${domain}</code> ·
-        ${names.length} Entit${names.length === 1 ? "y" : "ies"} werden
+        Datei <code>${path}</code> · Bereich <code>${domain}</code> ·
+        ${names.length} Entität${names.length === 1 ? "" : "en"} werden
         angelegt
       </p>
       <div class="preview">
@@ -243,8 +243,8 @@ export class StepCommit extends LitElement {
             @click=${this.commit}
           >
             ${this.loading
-              ? "Committe…"
-              : `${names.length} Entit${names.length === 1 ? "y" : "ies"} committen`}
+              ? "Übernehme…"
+              : `${names.length} Entität${names.length === 1 ? "" : "en"} übernehmen`}
           </knx-btn>
         </div>
       </div>

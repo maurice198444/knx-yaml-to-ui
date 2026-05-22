@@ -4,7 +4,7 @@ import "../components/ui/card.js";
 import "../components/ui/btn.js";
 import "../components/ui/pill.js";
 import "../components/ui/icon.js";
-import "../components/ui/live-dot.js";
+import "../components/ui/modal.js";
 import { api, ApiClientError } from "../api/client.js";
 import { ws } from "../api/ws.js";
 import type { StateEvent } from "../api/ws.js";
@@ -13,6 +13,7 @@ import type { LiveStatus } from "../components/ui/live-dot.js";
 
 interface LiveSnapshot {
   state: string | null;
+  unit: string | null;
   lastChanged: string | null;
 }
 
@@ -44,6 +45,8 @@ export class EntitiesView extends LitElement {
     }
     .card-head .count {
       margin-left: auto;
+      font-size: 13px;
+      color: var(--text-secondary);
     }
     table {
       width: 100%;
@@ -103,6 +106,10 @@ export class EntitiesView extends LitElement {
     .state.on .sdot {
       background: var(--ok);
     }
+    .state .unit {
+      opacity: 0.75;
+      margin-left: 1px;
+    }
     .state.unknown {
       opacity: 0.7;
     }
@@ -138,6 +145,25 @@ export class EntitiesView extends LitElement {
     .error {
       color: var(--err);
     }
+    .modal-list {
+      list-style: none;
+      padding: 10px 14px;
+      margin: 6px 0;
+      background: var(--surface-2);
+      border-radius: 8px;
+      max-height: 180px;
+      overflow: auto;
+    }
+    .modal-list li {
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 3px 0;
+      color: var(--text-secondary);
+    }
+    .modal-warn {
+      color: var(--err);
+      font-size: 13px;
+    }
   `;
 
   @state() private entities: EntitySummary[] = [];
@@ -147,6 +173,7 @@ export class EntitiesView extends LitElement {
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private deleting = false;
+  @state() private deleteModalOpen = false;
   @state() private wsStatus: LiveStatus = ws.status;
 
   private flashTimers = new Map<string, number>();
@@ -154,8 +181,10 @@ export class EntitiesView extends LitElement {
     const detail = (e as CustomEvent<StateEvent>).detail;
     if (!detail.entity_id) return;
     const next = new Map(this.liveStates);
+    const unit = (detail.attributes?.["unit_of_measurement"] as string | undefined) ?? null;
     next.set(detail.entity_id, {
       state: detail.state,
+      unit,
       lastChanged: detail.last_changed,
     });
     this.liveStates = next;
@@ -224,16 +253,21 @@ export class EntitiesView extends LitElement {
     else this.selected = new Set();
   }
 
-  private async deleteSelected(): Promise<void> {
-    if (this.selected.size === 0 || this.deleting) return;
-    const ids = [...this.selected];
-    const confirmMsg =
-      ids.length === 1
-        ? `Entity ${ids[0]} wirklich löschen?`
-        : `${ids.length} Entities wirklich löschen?`;
-    if (!window.confirm(confirmMsg)) return;
+  private openDeleteModal(): void {
+    if (this.selected.size === 0) return;
+    this.deleteModalOpen = true;
+  }
+
+  private closeDeleteModal(): void {
+    if (this.deleting) return;
+    this.deleteModalOpen = false;
+  }
+
+  private async confirmDelete(): Promise<void> {
+    if (this.deleting) return;
     this.deleting = true;
     this.error = null;
+    const ids = [...this.selected];
     const errors: string[] = [];
     for (const id of ids) {
       try {
@@ -245,6 +279,7 @@ export class EntitiesView extends LitElement {
       }
     }
     this.deleting = false;
+    this.deleteModalOpen = false;
     if (errors.length > 0) this.error = errors.join(" · ");
     await this.refresh();
   }
@@ -260,8 +295,13 @@ export class EntitiesView extends LitElement {
     if (!value) return "state unknown";
     const v = value.toLowerCase();
     if (v === "on") return "state on";
-    if (v === "off" || v === "unavailable" || v === "unknown") return "state";
     return "state";
+  }
+
+  private renderStateValue(value: string | null, unit: string | null) {
+    if (value === null) return html`—`;
+    if (unit) return html`${value}<span class="unit"> ${unit}</span>`;
+    return html`${value}`;
   }
 
   override render() {
@@ -269,25 +309,25 @@ export class EntitiesView extends LitElement {
     const selectedCount = this.selected.size;
     const allSelected = total > 0 && selectedCount === total;
     return html`
-      <h1>KNX Entities</h1>
-      <p class="lede">Liste aller KNX-Entities mit Live-State via WebSocket.</p>
+      <h1>KNX-Entitäten</h1>
+      <p class="lede">Liste aller KNX-Entitäten mit Live-Status über WebSocket.</p>
       <knx-card>
         <div class="card-head">
-          <h2>KNX Entities</h2>
-          <knx-live-dot class="count" .status=${this.wsStatus}>
+          <h2>KNX-Entitäten</h2>
+          <span class="count">
             ${this.wsStatus === "open"
-              ? html`live · ${total} entities`
+              ? html`Live · ${total} Entitäten`
               : this.wsStatus === "connecting"
-                ? html`verbinde…`
-                : html`offline · ${total} entities`}
-          </knx-live-dot>
+                ? html`Verbinde…`
+                : html`Offline · ${total} Entitäten`}
+          </span>
         </div>
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${this.loading
-          ? html`<div class="loading">Lade Entities…</div>`
+          ? html`<div class="loading">Lade Entitäten…</div>`
           : total === 0
             ? html`<div class="empty">
-                Keine KNX-Entities gefunden. Lege welche im Convert-Tab an.
+                Keine KNX-Entitäten gefunden. Lege welche im Konvertieren-Tab an.
               </div>`
             : html`
                 <table>
@@ -303,17 +343,19 @@ export class EntitiesView extends LitElement {
                             )}
                         />
                       </th>
-                      <th>Entity ID</th>
-                      <th>State</th>
-                      <th>Source</th>
-                      <th>Last update</th>
+                      <th>Entitäts-ID</th>
+                      <th>Status</th>
+                      <th>Quelle</th>
+                      <th>Letzte Aktualisierung</th>
                     </tr>
                   </thead>
                   <tbody>
                     ${this.entities.map((e) => {
                       const live = this.liveStates.get(e.entity_id);
                       const stateValue = live?.state ?? e.state ?? null;
-                      const lastChanged = live?.lastChanged ?? null;
+                      const unit = live?.unit ?? e.unit_of_measurement ?? null;
+                      const lastChanged =
+                        live?.lastChanged ?? e.last_changed ?? null;
                       const rowClass = this.recentlyUpdated.has(e.entity_id)
                         ? "updated"
                         : "";
@@ -333,7 +375,8 @@ export class EntitiesView extends LitElement {
                           <td class="mono">${e.entity_id}</td>
                           <td>
                             <span class=${this.stateClass(stateValue)}>
-                              <span class="sdot"></span>${stateValue ?? "—"}
+                              <span class="sdot"></span
+                              >${this.renderStateValue(stateValue, unit)}
                             </span>
                           </td>
                           <td>
@@ -348,23 +391,44 @@ export class EntitiesView extends LitElement {
               `}
         <div class="card-foot">
           <knx-btn variant="ghost" @click=${this.refresh} ?disabled=${this.loading}>
-            <knx-icon name="refresh"></knx-icon>Refresh
+            <knx-icon name="refresh"></knx-icon>Aktualisieren
           </knx-btn>
           <knx-btn
             class="del"
             variant="danger"
             ?disabled=${selectedCount === 0 || this.deleting}
-            @click=${this.deleteSelected}
+            @click=${this.openDeleteModal}
           >
             <knx-icon name="trash"></knx-icon>
-            ${this.deleting
-              ? "Lösche…"
-              : selectedCount === 0
-                ? "Markierte löschen"
-                : `${selectedCount} löschen`}
+            ${selectedCount === 0
+              ? "Markierte löschen"
+              : `${selectedCount} löschen`}
           </knx-btn>
         </div>
       </knx-card>
+
+      <knx-modal
+        ?open=${this.deleteModalOpen}
+        kind="danger"
+        .heading=${this.selected.size === 1
+          ? "Entität löschen?"
+          : `${this.selected.size} Entitäten löschen?`}
+        confirmLabel=${this.selected.size === 1 ? "Löschen" : "Alle löschen"}
+        cancelLabel="Abbrechen"
+        ?busy=${this.deleting}
+        @cancel=${this.closeDeleteModal}
+        @confirm=${this.confirmDelete}
+      >
+        <p>
+          Folgende
+          ${this.selected.size === 1 ? "Entität wird" : "Entitäten werden"}
+          aus der KNX-Integration entfernt:
+        </p>
+        <ul class="modal-list">
+          ${[...this.selected].map((id) => html`<li>${id}</li>`)}
+        </ul>
+        <p class="modal-warn">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+      </knx-modal>
     `;
   }
 }

@@ -132,7 +132,7 @@ export class StepParse extends LitElement {
         Datei <code>${path}</code> · Ziel-Domain <code>${domain}</code>
       </p>
       ${this.loading
-        ? html`<div class="loading">Parse läuft…</div>`
+        ? html`<div class="loading">Parser läuft…</div>`
         : this.error
           ? html`<div class="error">${this.error}</div>`
           : this.result
@@ -156,7 +156,7 @@ export class StepParse extends LitElement {
                 </div>
                 <p class="meta">
                   Rohgröße: ${this.result.raw_size} Bytes ·
-                  ${this.targetDomainEntries} Entities in
+                  ${this.targetDomainEntries} Entitäten in
                   <code>${domain}</code>
                 </p>
               `
@@ -171,7 +171,7 @@ export class StepParse extends LitElement {
             ?disabled=${!this.result || this.targetDomainEntries === 0}
             @click=${this.next}
           >
-            Dry-Run starten
+            Testlauf starten
             <knx-icon name="chevron-right"></knx-icon>
           </knx-btn>
         </div>

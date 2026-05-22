@@ -10,10 +10,16 @@ import { effectiveTheme, readThemePref, setThemePref } from "../theme.js";
 import type { ThemePref } from "../theme.js";
 
 const TABS = [
-  { id: "convert", label: "Convert" },
-  { id: "entities", label: "Entities" },
-  { id: "history", label: "History" },
+  { id: "convert", label: "Konvertieren" },
+  { id: "entities", label: "Entitäten" },
+  { id: "history", label: "Verlauf" },
 ];
+
+const WS_LABEL: Record<LiveStatus, string> = {
+  open: "verbunden",
+  connecting: "verbinde…",
+  closed: "getrennt",
+};
 
 @customElement("knx-topbar")
 export class KnxTopbar extends LitElement {
@@ -66,6 +72,58 @@ export class KnxTopbar extends LitElement {
       align-items: center;
       gap: 4px;
       padding-left: 8px;
+    }
+    .ws-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      margin-right: 6px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .ws-status .bigdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      box-shadow: 0 0 0 0 transparent;
+      transition: background 0.2s;
+    }
+    .ws-status.open .bigdot {
+      background: var(--ok);
+      animation: ws-pulse 2.2s infinite;
+    }
+    .ws-status.connecting .bigdot {
+      background: var(--warn);
+      animation: ws-pulse 1.1s infinite;
+    }
+    .ws-status.closed .bigdot {
+      background: var(--err);
+    }
+    .ws-status.open {
+      color: var(--ok);
+      background: var(--ok-bg);
+    }
+    .ws-status.connecting {
+      color: var(--warn);
+      background: var(--warn-bg);
+    }
+    .ws-status.closed {
+      color: var(--err);
+      background: var(--err-bg);
+    }
+    @keyframes ws-pulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 currentColor;
+      }
+      50% {
+        box-shadow: 0 0 0 6px transparent;
+      }
     }
     .icon-btn {
       width: 38px;
@@ -123,7 +181,12 @@ export class KnxTopbar extends LitElement {
           @change=${this.onTab}
         ></knx-tabs>
         <div class="right">
-          <knx-live-dot .status=${this.wsStatus}></knx-live-dot>
+          <span
+            class="ws-status ${this.wsStatus}"
+            title="WebSocket-Status: ${WS_LABEL[this.wsStatus]}"
+          >
+            <span class="bigdot"></span>${WS_LABEL[this.wsStatus]}
+          </span>
           <button
             class="icon-btn"
             title="Theme: ${this.themePref}"
