@@ -1,0 +1,82 @@
+/* Design tokens extracted from docs/active/webapp/plan-03-mockups/
+   mockup-1-ha-native.html (Light) and mockup-3-dark.html (Dark). */
+
+:root,
+[data-theme="light"] {
+  --accent: #03a9f4;
+  --accent-dark: #0288d1;
+  --accent-soft: rgba(3, 169, 244, 0.1);
+  --accent-line: rgba(3, 169, 244, 0.28);
+
+  --bg: #f5f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f4f8;
+  --border: #e3e7eb;
+  --border-strong: #cbd2da;
+
+  --text: #212121;
+  --text-secondary: #5f6c7b;
+  --text-tertiary: #8a96a3;
+
+  --ok: #22a45d;
+  --ok-bg: #e7f6ee;
+  --err: #db4437;
+  --err-bg: #fcebea;
+  --warn: #f5a623;
+  --warn-bg: #fef5e7;
+
+  --d-light: #f5a623;
+  --d-light-bg: #fef3e0;
+  --d-sensor: #03a9f4;
+  --d-sensor-bg: #e3f4fd;
+  --d-cover: #7e57c2;
+  --d-cover-bg: #f0eafa;
+  --d-climate: #ef5350;
+  --d-climate-bg: #fdeded;
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --accent: #38bdf8;
+  --accent-dark: #0ea5e9;
+  --accent-soft: rgba(56, 189, 248, 0.1);
+  --accent-line: rgba(56, 189, 248, 0.28);
+
+  --bg: #0e1116;
+  --surface: #161a21;
+  --surface-2: #1c212a;
+  --border: #262c36;
+  --border-strong: #333b47;
+
+  --text: #e6e9ee;
+  --text-secondary: #99a2af;
+  --text-tertiary: #6a7280;
+
+  --ok: #4ade80;
+  --ok-bg: rgba(74, 222, 128, 0.12);
+  --err: #f87171;
+  --err-bg: rgba(248, 113, 113, 0.12);
+  --warn: #fbbf24;
+  --warn-bg: rgba(251, 191, 36, 0.12);
+
+  --d-light: #fbbf24;
+  --d-light-bg: rgba(251, 191, 36, 0.08);
+  --d-sensor: #38bdf8;
+  --d-sensor-bg: rgba(56, 189, 248, 0.08);
+  --d-cover: #a78bfa;
+  --d-cover-bg: rgba(167, 139, 250, 0.08);
+  --d-climate: #f87171;
+  --d-climate-bg: rgba(248, 113, 113, 0.08);
+
+  --radius: 13px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+:root {
+  --font: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "Roboto Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+}
