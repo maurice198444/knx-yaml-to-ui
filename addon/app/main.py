@@ -30,9 +30,7 @@ DEFAULT_WEB_DIR = Path("/app/web")
 def _resolve_web_dir() -> Path | None:
     override = os.environ.get("KNX_WEB_DIR")
     candidates = [Path(override)] if override else []
-    candidates.extend(
-        [DEFAULT_WEB_DIR, Path(__file__).parent.parent / "web" / "dist"]
-    )
+    candidates.extend([DEFAULT_WEB_DIR, Path(__file__).parent.parent / "web" / "dist"])
     for c in candidates:
         if c.is_dir() and (c / "index.html").is_file():
             return c
