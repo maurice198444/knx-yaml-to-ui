@@ -4,6 +4,7 @@ import "../components/ui/card.js";
 import "../components/ui/btn.js";
 import "../components/ui/pill.js";
 import "../components/ui/icon.js";
+import type { IconName } from "../components/ui/icon.js";
 import "../components/ui/modal.js";
 import { api, ApiClientError } from "../api/client.js";
 import { ws } from "../api/ws.js";
@@ -80,6 +81,40 @@ export class EntitiesView extends LitElement {
     }
     .check-col {
       width: 38px;
+    }
+    .id-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .id-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+    .id-icon.light {
+      background: var(--d-light-bg);
+      color: var(--d-light);
+    }
+    .id-icon.sensor {
+      background: var(--d-sensor-bg);
+      color: var(--d-sensor);
+    }
+    .id-icon.cover {
+      background: var(--d-cover-bg);
+      color: var(--d-cover);
+    }
+    .id-icon.climate {
+      background: var(--d-climate-bg);
+      color: var(--d-climate);
+    }
+    .id-icon.neutral {
+      background: var(--surface-2);
+      color: var(--text-secondary);
     }
     .state {
       display: inline-flex;
@@ -298,6 +333,29 @@ export class EntitiesView extends LitElement {
     return "state";
   }
 
+  private iconForEntity(entityId: string): { icon: IconName; kind: string } {
+    const prefix = entityId.split(".", 1)[0] ?? "";
+    switch (prefix) {
+      case "light":
+        return { icon: "lightbulb", kind: "light" };
+      case "switch":
+        return { icon: "power", kind: "light" };
+      case "sensor":
+        return { icon: "activity", kind: "sensor" };
+      case "binary_sensor":
+        return { icon: "alert-circle", kind: "sensor" };
+      case "cover":
+        return { icon: "layout", kind: "cover" };
+      case "climate":
+        return { icon: "thermometer", kind: "climate" };
+      case "time":
+      case "datetime":
+        return { icon: "clock", kind: "neutral" };
+      default:
+        return { icon: "file", kind: "neutral" };
+    }
+  }
+
   private renderStateValue(value: string | null, unit: string | null) {
     if (value === null) return html`—`;
     if (unit) return html`${value}<span class="unit"> ${unit}</span>`;
@@ -372,7 +430,17 @@ export class EntitiesView extends LitElement {
                                 )}
                             />
                           </td>
-                          <td class="mono">${e.entity_id}</td>
+                          <td>
+                            <div class="id-cell">
+                              ${(() => {
+                                const ic = this.iconForEntity(e.entity_id);
+                                return html`<span class="id-icon ${ic.kind}"
+                                  ><knx-icon .name=${ic.icon}></knx-icon
+                                ></span>`;
+                              })()}
+                              <span class="mono">${e.entity_id}</span>
+                            </div>
+                          </td>
                           <td>
                             <span class=${this.stateClass(stateValue)}>
                               <span class="sdot"></span
