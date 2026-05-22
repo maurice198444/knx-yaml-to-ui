@@ -54,3 +54,26 @@ async def test_get_one_entity_returns_config(client: AsyncClient) -> None:
     body = resp.json()
     assert body["entity_id"] == "light.diele"
     assert body["config"]["platform"] == "light"
+
+
+@pytest.mark.asyncio
+async def test_delete_entity_sends_knx_delete_and_returns_204(
+    client: AsyncClient, fake_ha_client: FakeHAClient
+) -> None:
+    resp = await client.delete("/api/entities/light.diele")
+    assert resp.status_code == 204
+    assert resp.content == b""
+    sent_types = [p["type"] for p in fake_ha_client.sent]
+    assert "knx/delete_entity" in sent_types
+    delete_payload = next(p for p in fake_ha_client.sent if p["type"] == "knx/delete_entity")
+    assert delete_payload["entity_id"] == "light.diele"
+
+
+@pytest.mark.asyncio
+async def test_delete_entity_propagates_ha_error_as_502(
+    client: AsyncClient, fake_ha_client: FakeHAClient
+) -> None:
+    fake_ha_client.errors["knx/delete_entity"] = "entity not in config_store"
+    resp = await client.delete("/api/entities/light.missing")
+    assert resp.status_code == 502
+    assert "entity not in config_store" in resp.json()["detail"]

@@ -47,6 +47,7 @@ async def state_stream(ws: WebSocket) -> None:
                     "entity_id": data.get("entity_id"),
                     "state": new_state.get("state"),
                     "attributes": new_state.get("attributes", {}),
+                    "last_changed": new_state.get("last_changed"),
                 }
             )
     except WebSocketDisconnect:
