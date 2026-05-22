@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Mockup 05 — Wizard Flow</title>
+<style>
+  :root {
+    --primary: #e65100;
+    --primary-light: #f57c00;
+    --accent: #1976d2;
+    --bg: #fff8f3;
+    --surface: #ffffff;
+    --border: #ffe0b2;
+    --border-strong: #ffb74d;
+    --text: #2e1c0a;
+    --text-secondary: #8d6e4e;
+    --success: #2e7d32;
+    --error: #c62828;
+    --warning: #ef6c00;
+    --shadow: 0 2px 6px rgba(230,81,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(230,81,0,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.5; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  header.topbar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface); color: var(--text);
+    padding: 0 24px; height: 60px;
+    border-bottom: 2px solid var(--border);
+  }
+  header.topbar .logo { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 10px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 16px; }
+  header.topbar .title { font-size: 17px; font-weight: 700; }
+  header.topbar .version { font-size: 12px; color: var(--text-secondary); font-family: ui-monospace, monospace; }
+  header.topbar nav.tabs { margin-left: auto; display: flex; gap: 4px; }
+  header.topbar nav.tabs button { background: none; border: 0; padding: 8px 16px; border-radius: 6px; color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  header.topbar nav.tabs button:hover { background: var(--bg); color: var(--text); }
+  header.topbar nav.tabs button.active { background: var(--primary); color: #fff; }
+
+  main { flex: 1; overflow: auto; padding: 24px; }
+  .tab-panel { display: none; max-width: 980px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* Stepper */
+  .stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 32px; position: relative; }
+  .stepper::before { content: ""; position: absolute; top: 24px; left: 12.5%; right: 12.5%; height: 3px; background: var(--border); z-index: 0; }
+  .step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
+  .step .circle { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); border: 3px solid var(--border); color: var(--text-secondary); display: grid; place-items: center; font-weight: 700; font-size: 16px; margin-bottom: 8px; transition: all .2s; }
+  .step.done .circle { background: var(--success); border-color: var(--success); color: #fff; }
+  .step.active .circle { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 6px rgba(230,81,0,.15); }
+  .step .label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .step.done .label, .step.active .label { color: var(--text); }
+  .step.active .label { color: var(--primary); }
+
+  /* Step content */
+  .step-content { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 32px; border: 1px solid var(--border); }
+  .step-content h2 { margin: 0 0 8px; font-size: 22px; font-weight: 700; }
+  .step-content .step-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+  .file-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .file-pick .file { padding: 16px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all .15s; }
+  .file-pick .file:hover { border-color: var(--border-strong); }
+  .file-pick .file.selected { border-color: var(--primary); background: rgba(230,81,0,.04); }
+  .file-pick .file .fname { font-family: ui-monospace, monospace; font-weight: 700; }
+  .file-pick .file .fmeta { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+  .preview-box { background: var(--bg); border-radius: 10px; padding: 20px; font-family: ui-monospace, monospace; font-size: 13px; white-space: pre; border: 1px solid var(--border); margin-bottom: 16px; max-height: 240px; overflow: auto; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th { background: var(--bg); padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; border-radius: 6px 6px 0 0; }
+  td { padding: 14px; border-top: 1px solid var(--border); font-size: 14px; }
+  .pill { display: inline-flex; align-items: center; padding: 3px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; }
+  .pill.ok { background: rgba(46,125,50,.12); color: var(--success); }
+  .pill.err { background: rgba(198,40,40,.12); color: var(--error); }
+  .pill.warn { background: rgba(239,108,0,.16); color: var(--warning); }
+
+  .confirm-box { background: linear-gradient(135deg, rgba(230,81,0,.08), rgba(245,124,0,.04)); border: 2px solid var(--primary); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 16px; }
+  .confirm-box h3 { margin: 0 0 8px; font-size: 18px; }
+  .confirm-box p { margin: 0; color: var(--text-secondary); }
+  .confirm-box .num { font-size: 36px; font-weight: 800; color: var(--primary); line-height: 1; margin: 12px 0; }
+
+  .wizard-actions { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--border); margin-top: 24px; }
+  button.btn { background: var(--primary); color: #fff; border: 0; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; font-family: inherit; transition: all .15s; }
+  button.btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+  button.btn.secondary { background: transparent; color: var(--text-secondary); border: 2px solid var(--border); }
+  button.btn.secondary:hover { background: var(--bg); color: var(--text); border-color: var(--border-strong); transform: none; box-shadow: none; }
+  button.btn.success { background: var(--success); font-size: 16px; padding: 14px 32px; }
+  button.btn.success:hover { background: #1b5e20; }
+
+  /* Entities / History tabs */
+  .card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 24px; border: 1px solid var(--border); }
+  .card-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .card-head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+  .card-head .count { color: var(--text-secondary); font-size: 13px; margin-left: auto; }
+  .mono { font-family: ui-monospace, monospace; font-size: 13px; }
+  .state-on { color: var(--success); font-weight: 700; }
+  .state-off { color: var(--text-secondary); }
+  .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; margin-right: 6px; box-shadow: 0 0 6px var(--success); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo">K</div>
+    <div>
+      <div class="title">KNX YAML</div>
+      <div class="version">v0.0.3 · Wizard</div>
+    </div>
+    <nav class="tabs">
+      <button class="active" data-tab="convert">🪄 Convert</button>
+      <button data-tab="entities">🔌 Entities</button>
+      <button data-tab="history">📜 History</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- WIZARD -->
+    <section class="tab-panel active" id="tab-convert">
+      <div class="stepper">
+        <div class="step done"><div class="circle">✓</div><div class="label">1 · Datei wählen</div></div>
+        <div class="step done"><div class="circle">✓</div><div class="label">2 · Parsen</div></div>
+        <div class="step active"><div class="circle">3</div><div class="label">3 · Dry-Run</div></div>
+        <div class="step"><div class="circle">4</div><div class="label">4 · Commit</div></div>
+      </div>
+
+      <div class="step-content">
+        <h2>Dry-Run-Ergebnis prüfen</h2>
+        <div class="step-desc">Datei: <strong class="mono">/config/knx/light_test.yaml</strong> · Domain: <strong>light</strong> · 3 Entities erkannt.</div>
+
+        <table>
+          <thead><tr><th>Name</th><th>Status</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>Plan02 Smoke Diele</td><td><span class="pill ok">✓ ok</span></td><td><a style="color:var(--primary);font-size:13px;cursor:pointer;font-weight:600;">Payload anzeigen</a></td></tr>
+            <tr><td>Climate Bad (setpoint_shift)</td><td><span class="pill err">✗ error</span></td><td style="color:var(--error);font-size:13px;">unsupported feature: setpoint_shift</td></tr>
+            <tr><td>Switch Steckdose</td><td><span class="pill ok">✓ ok</span></td><td><a style="color:var(--primary);font-size:13px;cursor:pointer;font-weight:600;">Payload anzeigen</a></td></tr>
+          </tbody>
+        </table>
+
+        <div class="confirm-box">
+          <h3>Bereit zum Commit</h3>
+          <div class="num">2</div>
+          <p>Entities werden als UI-Config-Store-Einträge in HA angelegt. <br>1 Entity wird übersprungen (Feature-Limitation, siehe Tabelle).</p>
+        </div>
+
+        <div class="wizard-actions">
+          <button class="btn secondary">← Zurück zu Parsen</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn secondary">Abbrechen</button>
+            <button class="btn success">✓ 2 Entities committen →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTITIES -->
+    <section class="tab-panel" id="tab-entities">
+      <div class="card">
+        <div class="card-head">
+          <h2>KNX Entities</h2>
+          <span class="count"><span class="live-dot"></span>live · 3 entities</span>
+        </div>
+        <table>
+          <thead><tr><th><input type="checkbox" /></th><th>Entity ID</th><th>State</th><th>Source</th><th>Last update</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" /></td><td class="mono">light.plan02_smoke_diele</td><td class="state-on">● on</td><td><span class="pill ok">ui_store</span></td><td class="mono">12:04:18</td></tr>
+            <tr><td><input type="checkbox" /></td><td class="mono">light.plan02_smoke_diele_2</td><td class="state-off">○ off</td><td><span class="pill ok">ui_store</span></td><td class="mono">12:03:55</td></tr>
+            <tr><td><input type="checkbox" /></td><td class="mono">switch.steckdose</td><td class="state-on">● on</td><td><span class="pill warn">yaml</span></td><td class="mono">11:58:02</td></tr>
+          </tbody>
+        </table>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button class="btn secondary">↻ Refresh</button>
+          <button class="btn" style="background:var(--error);margin-left:auto;">Delete selected</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="tab-panel" id="tab-history">
+      <div class="card">
+        <div class="card-head">
+          <h2>Migration History</h2>
+          <span class="count">12 entries</span>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Time</th><th>Kind</th><th>Status</th><th>Entries</th></tr></thead>
+          <tbody>
+            <tr><td>3</td><td class="mono">2026-05-22 12:04:11</td><td class="mono">convert.commit</td><td><span class="pill ok">ok</span></td><td>1 applied</td></tr>
+            <tr><td>2</td><td class="mono">2026-05-22 11:58:02</td><td class="mono">convert.commit</td><td><span class="pill warn">partial</span></td><td>1/2 applied</td></tr>
+            <tr><td>1</td><td class="mono">2026-05-22 11:42:20</td><td class="mono">convert.commit</td><td><span class="pill ok">ok</span></td><td>0 entries</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

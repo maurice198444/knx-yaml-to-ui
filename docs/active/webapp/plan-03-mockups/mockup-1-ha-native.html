@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>KNX YAML — Mockup 1 · HA Native</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     MOCKUP 1 — "HA Native"
+     Genau der Home-Assistant-Hausstil: hell, Roboto, weiche
+     Karten, HA-Blau (#03a9f4) als einziger Primärecent.
+     Fühlt sich an wie ein offizielles Add-on.
+  ============================================================ */
+  :root {
+    --ha-primary: #03a9f4;          /* HA signature blue */
+    --ha-primary-dark: #0288d1;
+    --bg: #f5f7f9;
+    --surface: #ffffff;
+    --border: #e3e7eb;
+    --text: #212121;
+    --text-secondary: #5f6c7b;
+    --text-tertiary: #8a96a3;
+
+    --ok: #22a45d;
+    --ok-bg: #e7f6ee;
+    --err: #db4437;
+    --err-bg: #fcebea;
+    --warn: #f5a623;
+    --warn-bg: #fef5e7;
+
+    /* domain accent tints (pale, used only as icon backdrops) */
+    --d-light: #f5a623;
+    --d-light-bg: #fef3e0;
+    --d-sensor: #03a9f4;
+    --d-sensor-bg: #e3f4fd;
+    --d-cover: #7e57c2;
+    --d-cover-bg: #f0eafa;
+    --d-climate: #ef5350;
+    --d-climate-bg: #fdeded;
+
+    --font: "Roboto", -apple-system, "Segoe UI", sans-serif;
+    --mono: "Roboto Mono", ui-monospace, monospace;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.5; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* HA-style header bar */
+  header.topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    display: flex; align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--ha-primary);
+    display: grid; place-items: center;
+    color: #fff; font-weight: 700; font-size: 18px;
+    box-shadow: 0 2px 8px rgba(3,169,244,.3);
+  }
+  .brand .name { font-size: 18px; font-weight: 500; }
+  .brand .ver { font-family: var(--mono); font-size: 12px; color: var(--text-tertiary); }
+  nav.tabs { margin-left: auto; display: flex; gap: 4px; }
+  nav.tabs button {
+    font-family: inherit; font-size: 15px; font-weight: 500;
+    border: 0; background: none; color: var(--text-secondary);
+    padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: all .15s;
+  }
+  nav.tabs button:hover { background: var(--bg); color: var(--text); }
+  nav.tabs button.active { background: var(--ha-primary); color: #fff; }
+  .conn { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); padding-left: 8px; }
+  .conn .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(34,164,93,.5); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,164,93,.5); } 50% { box-shadow: 0 0 0 5px rgba(34,164,93,0); } }
+
+  main { flex: 1; padding: 28px 24px 56px; max-width: 1080px; margin: 0 auto; width: 100%; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* Domain tiles row */
+  .section-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; margin: 0 0 14px; }
+  .domains { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
+  .domain {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; cursor: pointer; transition: all .18s; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .domain:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.08); border-color: var(--ha-primary); }
+  .domain .ico { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+  .domain .ico svg { width: 24px; height: 24px; }
+  .domain.light .ico { background: var(--d-light-bg); color: var(--d-light); }
+  .domain.sensor .ico { background: var(--d-sensor-bg); color: var(--d-sensor); }
+  .domain.cover .ico { background: var(--d-cover-bg); color: var(--d-cover); }
+  .domain.climate .ico { background: var(--d-climate-bg); color: var(--d-climate); }
+  .domain .meta .title { font-size: 16px; font-weight: 500; }
+  .domain .meta .status { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .domain .meta .status b { color: var(--ok); font-weight: 500; }
+  .domain .count { margin-left: auto; font-size: 22px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+
+  /* Stepper */
+  .stepper { display: grid; grid-template-columns: repeat(4,1fr); position: relative; margin-bottom: 36px; padding-top: 6px; }
+  .stepper::before { content: ""; position: absolute; top: 26px; left: 12.5%; right: 12.5%; height: 2px; background: var(--border); }
+  .stepper::after { content: ""; position: absolute; top: 26px; left: 12.5%; width: calc((var(--progress,3) - 1)/3 * 75%); height: 2px; background: var(--ha-primary); transition: width .6s cubic-bezier(.4,0,.2,1); }
+  .step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .step .circle { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); color: var(--text-tertiary); display: grid; place-items: center; font-weight: 700; font-size: 15px; margin-bottom: 10px; transition: all .3s; }
+  .step .circle svg { width: 16px; height: 16px; }
+  .step.done .circle { background: var(--ha-primary); border-color: var(--ha-primary); color: #fff; }
+  .step.active .circle { background: #fff; border-color: var(--ha-primary); color: var(--ha-primary); animation: glow 2.2s ease-in-out infinite; }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(3,169,244,.4); }
+    50%     { box-shadow: 0 0 0 8px rgba(3,169,244,0), 0 0 16px 2px rgba(3,169,244,.35); }
+  }
+  .step .label { font-size: 14px; font-weight: 500; color: var(--text-tertiary); }
+  .step.done .label, .step.active .label { color: var(--text); }
+  .step.active .label { color: var(--ha-primary); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+  .card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 500; }
+  .card .meta { color: var(--text-secondary); font-size: 14px; margin-bottom: 22px; }
+  .card .meta code { font-family: var(--mono); font-size: 13px; background: var(--bg); padding: 2px 7px; border-radius: 5px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 0 14px 12px; font-size: 12px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid var(--border); }
+  td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--bg); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); } .pill.ok .dot { background: var(--ok); }
+  .pill.err { background: var(--err-bg); color: var(--err); } .pill.err .dot { background: var(--err); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); } .pill.warn .dot { background: var(--warn); }
+  .mono { font-family: var(--mono); font-size: 13px; }
+  a.link { color: var(--ha-primary); cursor: pointer; font-size: 13px; font-weight: 500; text-decoration: none; }
+  a.link:hover { text-decoration: underline; }
+
+  .summary { margin: 26px 0 6px; padding: 22px 26px; background: var(--ha-primary); border-radius: var(--radius); color: #fff; display: flex; align-items: center; gap: 24px; box-shadow: 0 4px 16px rgba(3,169,244,.25); }
+  .summary .num { font-size: 52px; font-weight: 700; line-height: 1; font-family: var(--mono); }
+  .summary h3 { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
+  .summary p { margin: 0; font-size: 14px; opacity: .92; max-width: 460px; }
+
+  .actions { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid var(--border); }
+  .actions .right { display: flex; gap: 8px; }
+  .btn { font-family: inherit; font-size: 15px; font-weight: 500; padding: 11px 22px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+  .btn.primary { background: var(--ha-primary); color: #fff; }
+  .btn.primary:hover { background: var(--ha-primary-dark); box-shadow: 0 4px 12px rgba(3,169,244,.3); }
+  .btn.ghost { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+  .btn.ghost:hover { background: var(--bg); color: var(--text); }
+  .btn.text { background: transparent; color: var(--text-secondary); }
+  .btn.text:hover { color: var(--text); }
+
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .card-head h2 { margin: 0; }
+  .card-head .count { margin-left: auto; font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 7px; }
+  .card-head .count .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); animation: pulse 2.4s infinite; }
+  .state { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; }
+  .state .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .state.on { color: var(--ok); } .state.on .dot { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .state.off { color: var(--text-tertiary); } .state.off .dot { background: #cbd2da; }
+  input[type=checkbox]{ appearance:none; width:16px; height:16px; border:2px solid var(--border); border-radius:4px; cursor:pointer; position:relative; }
+  input[type=checkbox]:checked{ background:var(--ha-primary); border-color:var(--ha-primary); }
+  input[type=checkbox]:checked::after{ content:""; position:absolute; left:4px; top:1px; width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); }
+  .card-foot { display: flex; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 760px) {
+    .domains { grid-template-columns: repeat(2,1fr); }
+    nav.tabs button { padding: 8px 12px; }
+    .conn span { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div><div class="name">KNX YAML</div></div>
+      <div class="ver">v0.0.3</div>
+    </div>
+    <nav class="tabs">
+      <button class="active" data-tab="convert">Convert</button>
+      <button data-tab="entities">Entities</button>
+      <button data-tab="history">History</button>
+    </nav>
+    <div class="conn"><span class="dot"></span><span>HA verbunden · 1h 33m</span></div>
+  </header>
+
+  <main>
+    <!-- CONVERT -->
+    <section class="tab-panel active" id="tab-convert">
+
+      <!-- DOMAIN TILES -->
+      <div class="section-label">KNX Domains</div>
+      <div class="domains">
+        <div class="domain light">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></div>
+          <div class="meta"><div class="title">Licht</div><div class="status"><b>3 an</b> · 5 gesamt</div></div>
+          <div class="count">5</div>
+        </div>
+        <div class="domain sensor">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+          <div class="meta"><div class="title">Sensoren</div><div class="status">23 aktiv</div></div>
+          <div class="count">23</div>
+        </div>
+        <div class="domain cover">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 14h18M3 19h18"/></svg></div>
+          <div class="meta"><div class="title">Rolladen</div><div class="status">8 gesamt</div></div>
+          <div class="count">8</div>
+        </div>
+        <div class="domain climate">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div>
+          <div class="meta"><div class="title">Heizung</div><div class="status"><b>21.5°C</b> ⌀</div></div>
+          <div class="count">6</div>
+        </div>
+      </div>
+
+      <!-- STEPPER -->
+      <div class="stepper" style="--progress:3;">
+        <div class="step done"><div class="circle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l3 3 7-7"/></svg></div><div class="label">Datei</div></div>
+        <div class="step done"><div class="circle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l3 3 7-7"/></svg></div><div class="label">Parsen</div></div>
+        <div class="step active"><div class="circle">3</div><div class="label">Dry-Run</div></div>
+        <div class="step"><div class="circle">4</div><div class="label">Commit</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Dry-Run-Ergebnis prüfen</h2>
+        <div class="meta">Datei <code>/config/knx/light_test.yaml</code> · Domain <code>light</code> · 3 Entities erkannt</div>
+        <table>
+          <thead><tr><th style="width:42%">Name</th><th style="width:18%">Status</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>Plan02 Smoke Diele</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td><a class="link">Payload anzeigen →</a></td></tr>
+            <tr><td>Climate Bad <span class="mono" style="color:var(--text-tertiary)">(setpoint_shift)</span></td><td><span class="pill err"><span class="dot"></span>error</span></td><td style="color:var(--err);font-size:13px">unsupported feature: setpoint_shift</td></tr>
+            <tr><td>Switch Steckdose</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td><a class="link">Payload anzeigen →</a></td></tr>
+          </tbody>
+        </table>
+        <div class="summary">
+          <div class="num">2</div>
+          <div><h3>Bereit zum Commit</h3><p>Zwei Entities werden als UI-Config-Store-Einträge angelegt. Eine wird übersprungen (Feature-Limitation).</p></div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost">← Zurück</button>
+          <div class="right"><button class="btn text">Abbrechen</button><button class="btn primary">2 Entities committen →</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTITIES -->
+    <section class="tab-panel" id="tab-entities">
+      <div class="card">
+        <div class="card-head"><h2>KNX Entities</h2><span class="count"><span class="dot"></span>live · 3 entities</span></div>
+        <table>
+          <thead><tr><th style="width:38px"><input type="checkbox"></th><th>Entity ID</th><th>State</th><th>Source</th><th>Last update</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox"></td><td class="mono">light.plan02_smoke_diele</td><td><span class="state on"><span class="dot"></span>on</span></td><td><span class="pill ok"><span class="dot"></span>ui_store</span></td><td class="mono">12:04:18</td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">light.plan02_smoke_diele_2</td><td><span class="state off"><span class="dot"></span>off</span></td><td><span class="pill ok"><span class="dot"></span>ui_store</span></td><td class="mono">12:03:55</td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">switch.steckdose</td><td><span class="state on"><span class="dot"></span>on</span></td><td><span class="pill warn"><span class="dot"></span>yaml</span></td><td class="mono">11:58:02</td></tr>
+          </tbody>
+        </table>
+        <div class="card-foot"><button class="btn ghost">↻ Refresh</button><button class="btn text" style="margin-left:auto;color:var(--err)">Delete selected</button></div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="tab-panel" id="tab-history">
+      <div class="card">
+        <div class="card-head"><h2>Migration History</h2><span class="count">12 entries</span></div>
+        <table>
+          <thead><tr><th style="width:40px">#</th><th>Time</th><th>Kind</th><th>Status</th><th>Entries</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">03</td><td class="mono">2026-05-22 12:04:11</td><td class="mono">convert.commit</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td>1 applied</td></tr>
+            <tr><td class="mono">02</td><td class="mono">2026-05-22 11:58:02</td><td class="mono">convert.commit</td><td><span class="pill warn"><span class="dot"></span>partial</span></td><td>1/2 applied</td></tr>
+            <tr><td class="mono">01</td><td class="mono">2026-05-22 11:42:20</td><td class="mono">convert.commit</td><td><span class="pill ok"><span class="dot"></span>ok</span></td><td>0 entries</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    b.classList.add('active'); document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+  }));
+  document.querySelectorAll('.stepper .step').forEach((step,idx)=>step.addEventListener('click',()=>{
+    const s=step.closest('.stepper'); s.querySelectorAll('.step').forEach((el,i)=>{el.classList.remove('active','done'); if(i<idx)el.classList.add('done'); if(i===idx)el.classList.add('active');});
+    s.style.setProperty('--progress',idx+1);
+  }));
+</script>
+</body>
+</html>
